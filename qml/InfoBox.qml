@@ -6,8 +6,8 @@ Item {
     property alias title: textTitle.text
     property alias fontPixelSize: textItem.font.pixelSize
 
-    width: 140
-    height: 60
+    width: 230
+    height: 100
 
     Rectangle {
         opacity: 0.8
@@ -32,7 +32,7 @@ Item {
             anchors.centerIn: parent
             platformStyle: LabelStyle {
                 textColor: "yellow"
-                fontPixelSize: 26
+                fontPixelSize: 40
             }
         }
     }
@@ -66,7 +66,7 @@ Item {
             anchors.leftMargin: 5
             platformStyle: LabelStyle {
                 textColor: "white"
-                fontPixelSize: textItem.font.pixelSize * 0.6
+                fontPixelSize: textItem.font.pixelSize * 0.7
             }
         }
     }

@@ -4,71 +4,72 @@ import com.meego 1.0
 Page {
     id: mainPage
     tools: buttonTools
+    orientationLock: PageOrientation.LockPortrait
 
-    //orientationLock: PageOrientation.LockPortrait
-
-    Row {
+    Column {
         anchors.top: parent.top
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.margins: 10
         spacing: 10
+        Row {
+            spacing: 5
+            InfoBox {
+                id: distance
+                title: "Distance"
+                text: appcontroller.formatDistance(appcontroller.distance)
+            }
+            InfoBox {
+                id: cal
+                title: "Calories"
+                text: appcontroller.cal
+            }
+        }
+        Row {
+            spacing: 5
+            InfoBox {
+                id: speed
+                title: "Speed"
+                text: appcontroller.speed
+            }
+            InfoBox {
+                id: avgSpeed
+                title: "Average speed"
+                text: appcontroller.avgSpeed
+            }
+        }
+    }
+
+    Column {
+        id: colMain
+        spacing: 20
+        anchors.centerIn: parent
         InfoBox {
             id: time
             title:  "Time"
+            fontPixelSize: 50
+            width:  460
+            height: width * 0.2
             text: appcontroller.time
         }
         InfoBox {
-            id: distance
-            title: "Distance"
-            text: appcontroller.formatDistance(appcontroller.distance)
-        }
-        InfoBox {
-            id: speed
-            title: "Speed"
-            text: appcontroller.speed
-        }
-        InfoBox {
-            id: avgSpeed
-            title: "Average speed"
-            text: appcontroller.avgSpeed
-        }
-        InfoBox {
-            id: cal
-            title: "Calories"
-            text: appcontroller.cal
+            id: step
+            title: "Steps"
+            text: appcontroller.steps
+            fontPixelSize: 70
+            width:  460
+            height: width * 0.3
         }
     }
-    InfoBox {
-        id: step
-        title: "Steps"
-        text: appcontroller.steps
-        fontPixelSize: 70
-        anchors.centerIn: parent
-        width:  512
-        height: 160
-    }
-
-//    Button {
-//        id: btnStop
-//        anchors.horizontalCenter: parent.horizontalCenter
-//        anchors.top: step.bottom
-//        anchors.topMargin: 30
-//        text: appcontroller.running ? "Pause" : "Start"
-//        onClicked: appcontroller.running = !appcontroller.running;
-//        platformStyle: btnStopStyle
-//    }
 
     Rectangle {
         id: today
-        color: "#aaaaaa" //"#ddd8dd"
+        color: "#888888" //"#ddd8dd"
         border.width: 1
         radius: 10
         opacity: 0.8
-        anchors.top: step.bottom
+        anchors.top: colMain.bottom
         anchors.horizontalCenter: parent.horizontalCenter
-        //anchors.left: parent.left
-        //anchors.right: parent.right
-        anchors.margins: 40
+        anchors.topMargin: 100
         width: step.width
         height: 50
         Row {
@@ -79,26 +80,23 @@ Page {
                 text: "Today"
                 platformStyle: LabelStyle {
                     textColor: "white"
+                    fontPixelSize: 30
                 }
-                //anchors.horizontalCenter: parent.horizontalCenter
-                //anchors.right: col.left
             }
             Column {
                 id:col
-                //anchors.centerIn: parent
                 ProgressBar {
                     id: pb
-                    width: 300
+                    width: 230
                     minimumValue: 0
                     maximumValue: appcontroller.daily
                     value: appcontroller.todayDistance
-                    //anchors.horizontalCenter: parent.horizontalCenter
                 }
                 Label {
                     anchors.left: pb.left
                     anchors.leftMargin: {
                         var pos = (pb.width / appcontroller.daily) * appcontroller.todayDistance;
-                        if(pos < pb.width - width) {
+                        if(pos < pb.width - width / 2) {
                             pos -= width / 2;
                             if(pos < 0)
                                 pos = 0;
@@ -110,15 +108,15 @@ Page {
                     text: appcontroller.formatDistance(appcontroller.todayDistance)
                     platformStyle: LabelStyle {
                         textColor: "yellow"
+                        fontPixelSize: 30
                     }
                 }
             }
             Label {
-                //anchors.left: col.right
-                //anchors.horizontalCenter: parent.horizontalCenter
                 text: appcontroller.formatDistance(appcontroller.daily)
                 platformStyle: LabelStyle {
                     textColor: "white"
+                    fontPixelSize: 30
                 }
             }
         }
@@ -126,7 +124,7 @@ Page {
 
     Timer {
         id:fakeSteps
-        interval: 100
+        interval: 500
         running: appcontroller.running; repeat: true
         onTriggered: {
             appcontroller.steps++;
@@ -142,50 +140,27 @@ Page {
         }
     }
 
-    QueryDialog {
-        id: queryStop
-        titleText: "Stop"
-        message: "Are you sure you want to stop pedometer?"
-        acceptButtonText: "Yes"
-        rejectButtonText: "No"
-        onAccepted: appcontroller.reset();
-    }
-
     ToolBarLayout {
-            id: buttonTools
-            ToolIcon {
-                visible: false
-                iconId: "toolbar-back";
-                onClicked: { appMenu.close(); pageStack.pop(); }
-            }
-            ToolButtonRow {
-                ToolButton {
-                    id: btnStop
-                    text: appcontroller.running ? "Pause" : "Start"
-                    onClicked: appcontroller.running = !appcontroller.running;
-                    platformStyle: ButtonStyle {
-                        fontWeight: Font.Bold
-                        buttonWidth: 200
-                    }
-                }
-                ToolButton {
-                    text: "Stop"
-                    onClicked: {
-                        if(appcontroller.running)
-                            queryStop.open();
-                        else
-                            appcontroller.reset();
-                    }
-                    platformStyle: ButtonStyle {
-                        fontWeight: Font.Bold
-                        buttonWidth: 200
-                    }
-                }
-            }
-            ToolIcon {
-                platformIconId: "toolbar-view-menu";
-                anchors.right: parent === undefined ? undefined : parent.right
-                onClicked: (appMenu.status == DialogStatus.Closed) ? appMenu.open() : appMenu.close()
-            }
+        id: buttonTools
+        //            ToolIcon {
+        //                visible: false
+        //                iconId: "toolbar-back";
+        //                onClicked: { appMenu.close(); pageStack.pop(); }
+        //            }
+        ToolIcon {
+            id: btnStop
+            platformIconId: appcontroller.running ? "toolbar-mediacontrol-pause" : "toolbar-mediacontrol-play";
+            //anchors.right: parent === undefined ? undefined : parent.right
+            onClicked: appcontroller.running = !appcontroller.running;
         }
+        ToolIcon {
+            platformIconId: "toolbar-mediacontrol-stop"
+            onClicked: appcontroller.reset()
+        }
+        ToolIcon {
+            platformIconId: "toolbar-view-menu";
+            anchors.right: parent === undefined ? undefined : parent.right
+            onClicked: (appMenu.status == DialogStatus.Closed) ? appMenu.open() : appMenu.close()
+        }
+    }
 }

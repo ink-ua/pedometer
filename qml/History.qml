@@ -5,6 +5,7 @@ Page {
     id: histPage
     tools: histTools
     anchors.margins: 20
+    orientationLock: PageOrientation.LockPortrait
 
     TabGroup {
           id: tabGroup
@@ -14,36 +15,34 @@ Page {
               id:total
               anchors.centerIn: parent
               height: parent.height
-              width: 320
-              InfoBox {
-                  id: totalSteps
-                  title: "Total steps"
-                  text: appcontroller.totalSteps
-                  width:parent.width
-                  anchors.left: parent.left
-                  anchors.top: parent.top
-                  anchors.leftMargin: 10
-                  anchors.topMargin: 10
-              }
-              InfoBox {
-                  id: totalTime
-                  title: "Total time"
-                  text: appcontroller.totalTime
-                  width:parent.width
-                  anchors.left: parent.left
-                  anchors.top: totalSteps.bottom
-                  anchors.leftMargin: 10
-                  anchors.topMargin: 10
-              }
-              InfoBox {
-                  id: totalDistance
-                  title: "Total distance"
-                  text: appcontroller.formatDistance(appcontroller.totalSteps * appcontroller.stepLength)
-                  width:parent.width
-                  anchors.left: parent.left
-                  anchors.top: totalTime.bottom
-                  anchors.leftMargin: 10
-                  anchors.topMargin: 10
+              width: 430
+              Column {
+                  spacing: 20
+                  width: parent.width
+                  InfoBox {
+                      id: totalSteps
+                      title: "Total steps"
+                      text: appcontroller.totalSteps
+                      width: parent.width
+                  }
+                  InfoBox {
+                      id: totalTime
+                      title: "Total time"
+                      text: appcontroller.formatTime(appcontroller.totalTime)
+                      width: parent.width
+                  }
+                  InfoBox {
+                      id: totalDistance
+                      title: "Total distance"
+                      text: appcontroller.formatDistance(appcontroller.totalSteps * appcontroller.stepLength)
+                      width:parent.width
+                  }
+                  InfoBox {
+                      id: avgSpeed
+                      title: "Average speed"
+                      text: appcontroller.formatDistance((appcontroller.totalSteps * appcontroller.stepLength * 3600) / appcontroller.totalTime) + "/h"
+                      width:parent.width
+                  }
               }
           }
 
@@ -51,7 +50,7 @@ Page {
               id: daily
               anchors.centerIn: parent
               height: parent.height
-              width: 320
+              width: 430
               ListView {
                   id: listView
                   anchors.fill: parent
@@ -67,14 +66,10 @@ Page {
                       anchors.rightMargin: 20
                       color: "lightyellow"
                       border.width: 1
-                      //width: parent.width - 20
-                      //radius: 5
                       Column {
                           anchors.verticalCenter: parent.verticalCenter
                           anchors.left: parent.left
                           anchors.leftMargin: 10
-                          //anchors.margins: 10
-                          //spacing: 3
                           Row {
                               spacing: 10
                               Label {

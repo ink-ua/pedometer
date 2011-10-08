@@ -4,6 +4,7 @@ import com.meego 1.0
 Page {
     id: prefPage
     tools: prefTools
+    orientationLock: PageOrientation.LockPortrait
 
     Flickable {
         id: flickable
@@ -19,10 +20,10 @@ Page {
                 spacing: 10
                 Label {
                     id:lblStep
-                    text: "Step length (m): "
-                    platformStyle: LabelStyle {
-                        textColor: "white"
-                    }
+                    text: "Step length (m) "
+//                    platformStyle: LabelStyle {
+//                        textColor: "white"
+//                    }
                 }
                 TextField {
                     id: stepLength
@@ -34,10 +35,7 @@ Page {
                 spacing: 10
                 Label {
                     id:lblDaily
-                    text: "Daily distance (km): "
-                    platformStyle: LabelStyle {
-                        textColor: "white"
-                    }
+                    text: "Daily distance (km) "
                 }
                 TextField {
                     id: daily
@@ -45,9 +43,34 @@ Page {
                     anchors.verticalCenter: lblDaily.verticalCenter
                 }
             }
-            CheckBox{
-                text: "Pause when stop walking"
-                checked: appcontroller.pauseWalking
+            Row {
+                spacing: 10
+                Label {
+                    id:lblStop
+                    text: "Pause when stop walking"
+                }
+                Switch {
+                    id: stop
+                    checked: appcontroller.pauseWalking
+                    anchors.verticalCenter: lblStop.verticalCenter
+                }
+            }
+            Row {
+                spacing: 10
+                Label {
+                    id:lblSense
+                    text: "Sensetivity "
+                }
+                Slider {
+                    id: sense
+                    stepSize: 0.1
+                    valueIndicatorVisible: true
+                    value: 0.75
+                    minimumValue: 0
+                    maximumValue: 1
+                    width: 200
+                    anchors.verticalCenter: lblSense.verticalCenter
+                }
             }
         }
     }

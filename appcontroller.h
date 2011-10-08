@@ -24,7 +24,7 @@ class AppController : public QObject
     Q_PROPERTY(QString time READ getTime NOTIFY timeChanged)
     Q_PROPERTY(double distance READ getDistance NOTIFY distanceChanged)
     Q_PROPERTY(int totalSteps READ getTotalSteps NOTIFY totalStepsChanged)
-    Q_PROPERTY(QString totalTime READ getTotalTime NOTIFY totalTimeChanged)
+    Q_PROPERTY(int totalTime READ getTotalTime NOTIFY totalTimeChanged)
     Q_PROPERTY(QString avgSpeed READ getAvgSpeed NOTIFY avgSpeedChanged)
     Q_PROPERTY(QString speed READ getSpeed NOTIFY speedChanged)
     Q_PROPERTY(double todayDistance READ getTodayDistance NOTIFY todayDistanceChanged)
@@ -167,7 +167,7 @@ public:
         setSeconds(0);
     }
 
-    static QString formatTime(int seconds) {
+    Q_INVOKABLE static QString formatTime(int seconds) {
         int sec = seconds % 60;
         int min = (seconds / 60) % 60;
         int hr = (seconds / 3600) % 24;
@@ -181,11 +181,11 @@ public:
         return formatTime(m_seconds);
     }
 
-    QString getTotalTime() const {
-        return formatTime(m_totalTime);
+    int getTotalTime() const {
+        return m_totalTime;
     }
 
-    Q_INVOKABLE static QString formatDistance(double distance) {
+    Q_INVOKABLE QString formatDistance(double distance) {
         QString ret;
         if(distance > 1000)
             ret.sprintf("%.2f km", distance / 1000.0);

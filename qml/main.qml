@@ -3,11 +3,13 @@ import com.meego 1.0
 
 PageStackWindow {
     id: appWindow
+
+    //theme.colorScheme: "orange2"
     //showToolBar: false
 
-    platformStyle: PageStackWindowStyle {
-        background: "qrc:/bg.png"
-    }
+//    platformStyle: PageStackWindowStyle {
+//        background: "qrc:/bg.png"
+//    }
 
     function openFile(file) {
         var component = Qt.createComponent(file)
@@ -50,17 +52,17 @@ PageStackWindow {
                 text: "Preferences"
                 onClicked: appWindow.openFile('Preferences.qml')
             }
-            MenuItem {
-                text: "Quit"
-                onClicked: {
-                    if(appcontroller.running)
-                        queryQuit.open();
-                    else {
-                        appcontroller.save();
-                        Qt.quit();
-                    }
-                }
-            }
+//            MenuItem {
+//                text: "Quit"
+//                onClicked: {
+//                    if(appcontroller.running)
+//                        queryQuit.open();
+//                    else {
+//                        appcontroller.save();
+//                        Qt.quit();
+//                    }
+//                }
+//            }
         }
     }
 }
