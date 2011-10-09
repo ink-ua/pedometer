@@ -10,6 +10,7 @@
 #include <QDate>
 
 #include "historyentry.h"
+#include "stepsensor.h"
 
 #define LAST_STEPS_TIME 10
 
@@ -54,6 +55,8 @@ public:
         }
         totalStepsChanged();
         totalTimeChanged();
+
+        stepSensor.start();
     }
 
     ~AppController(){
@@ -212,6 +215,7 @@ private:
     int m_todaySteps;
     double m_calPerStep;
     int m_lastSteps;
+    StepsSensor stepSensor;
 
     QString getVar(QString key) {
         QSqlQuery query(m_db);

@@ -18,6 +18,7 @@ Page {
               width: 430
               Column {
                   spacing: 20
+                  anchors.topMargin: 30
                   width: parent.width
                   InfoBox {
                       id: totalSteps
@@ -66,28 +67,45 @@ Page {
                       anchors.rightMargin: 20
                       color: "lightyellow"
                       border.width: 1
-                      Column {
+                      Row {
+                          spacing: 10
                           anchors.verticalCenter: parent.verticalCenter
                           anchors.left: parent.left
                           anchors.leftMargin: 10
-                          Row {
-                              spacing: 10
+                          Column {
                               Label {
-                                  text: "Steps:"
+                                  text: "Steps"
                                   font.bold: true
                               }
                               Label {
                                   text: steps
                               }
                           }
-                          Row {
-                              spacing: 10
+                          Column {
                               Label {
-                                  text: "Time:"
+                                  text: "Time"
                                   font.bold: true
                               }
                               Label {
                                   text: time
+                              }
+                          }
+                          Column {
+                              Label {
+                                  text: "Distance"
+                                  font.bold: true
+                              }
+                              Label {
+                                  text: "1.00 km"
+                              }
+                          }
+                          Column {
+                              Label {
+                                  text: "Calories"
+                                  font.bold: true
+                              }
+                              Label {
+                                  text: "34.8"
                               }
                           }
                       }
@@ -119,20 +137,25 @@ Page {
         }
     }
 
-    ToolBarLayout {
+    ToolBar {
+        anchors.top: parent.top
         id: histTools
-        ToolIcon {
-            iconId: "toolbar-back";
-            onClicked: { appMenu.close(); pageStack.pop(); }
-        }
-        ButtonRow {
-            TabButton {
-                text: "Totals"
-                tab: total
-            }
-            TabButton {
-                text: "Daily"
-                tab: daily
+        ToolBarLayout {
+
+            //        ToolIcon {
+            //            iconId: "toolbar-back";
+            //            onClicked: { appMenu.close(); pageStack.pop(); }
+            //        }
+            ButtonRow {
+                TabButton {
+                    text: "Totals"
+                    tab: total
+                }
+                TabButton {
+                    text: "Daily"
+                    tab: daily
+                }
+
             }
         }
     }

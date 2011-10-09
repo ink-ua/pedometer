@@ -4,6 +4,7 @@
 #include <QtSql/QSqlError>
 #include <QDebug>
 #include <QtSql/QSqlQuery>
+
 #include "appcontroller.h"
 
 int main(int argc, char *argv[])

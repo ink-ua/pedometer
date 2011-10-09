@@ -3,14 +3,15 @@ import com.meego 1.0
 
 Page {
     id: mainPage
-    tools: buttonTools
+    //tools: mainToolBar
     orientationLock: PageOrientation.LockPortrait
 
     Column {
         anchors.top: parent.top
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.margins: 10
-        spacing: 10
+        anchors.topMargin: 40
+        spacing: 5
         Row {
             spacing: 5
             InfoBox {
@@ -41,7 +42,7 @@ Page {
 
     Column {
         id: colMain
-        spacing: 20
+        spacing: 10
         anchors.centerIn: parent
         InfoBox {
             id: time
@@ -69,7 +70,7 @@ Page {
         opacity: 0.8
         anchors.top: colMain.bottom
         anchors.horizontalCenter: parent.horizontalCenter
-        anchors.topMargin: 100
+        anchors.topMargin: 60
         width: step.width
         height: 50
         Row {
@@ -122,6 +123,54 @@ Page {
         }
     }
 
+    ButtonRow {
+        anchors.top: today.bottom
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.topMargin: 30
+        exclusive: false
+//        platformStyle: ButtonStyle {
+//            inverted: true
+//        }
+        Button {
+            iconSource: "image://theme/icon-m-" + (appcontroller.running ? "toolbar-mediacontrol-pause" : "toolbar-mediacontrol-play")
+            onClicked: appcontroller.running = !appcontroller.running
+            platformStyle: ButtonStyle {
+                buttonHeight: 80
+            }
+        }
+        Button {
+            iconSource: "image://theme/icon-m-toolbar-mediacontrol-stop"
+            onClicked: appcontroller.reset()
+            platformStyle: ButtonStyle {
+                buttonHeight: 80
+            }
+        }
+    }
+
+//    ToolBarLayout {
+//        id: buttonTools
+//        //            ToolIcon {
+//        //                visible: false
+//        //                iconId: "toolbar-back";
+//        //                onClicked: { appMenu.close(); pageStack.pop(); }
+//        //            }
+//        ToolIcon {
+//            id: btnStop
+//            platformIconId: appcontroller.running ? "toolbar-mediacontrol-pause" : "toolbar-mediacontrol-play";
+//            //anchors.right: parent === undefined ? undefined : parent.right
+//            onClicked: appcontroller.running = !appcontroller.running;
+//        }
+//        ToolIcon {
+//            platformIconId: "toolbar-mediacontrol-stop"
+//            onClicked: appcontroller.reset()
+//        }
+//        ToolIcon {
+//            platformIconId: "toolbar-view-menu";
+//            anchors.right: parent === undefined ? undefined : parent.right
+//            onClicked: (appMenu.status == DialogStatus.Closed) ? appMenu.open() : appMenu.close()
+//        }
+//    }
+
     Timer {
         id:fakeSteps
         interval: 500
@@ -137,30 +186,6 @@ Page {
         running: appcontroller.running; repeat: true
         onTriggered: {
             appcontroller.seconds++;
-        }
-    }
-
-    ToolBarLayout {
-        id: buttonTools
-        //            ToolIcon {
-        //                visible: false
-        //                iconId: "toolbar-back";
-        //                onClicked: { appMenu.close(); pageStack.pop(); }
-        //            }
-        ToolIcon {
-            id: btnStop
-            platformIconId: appcontroller.running ? "toolbar-mediacontrol-pause" : "toolbar-mediacontrol-play";
-            //anchors.right: parent === undefined ? undefined : parent.right
-            onClicked: appcontroller.running = !appcontroller.running;
-        }
-        ToolIcon {
-            platformIconId: "toolbar-mediacontrol-stop"
-            onClicked: appcontroller.reset()
-        }
-        ToolIcon {
-            platformIconId: "toolbar-view-menu";
-            anchors.right: parent === undefined ? undefined : parent.right
-            onClicked: (appMenu.status == DialogStatus.Closed) ? appMenu.open() : appMenu.close()
         }
     }
 }

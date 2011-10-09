@@ -3,7 +3,7 @@ import com.meego 1.0
 
 Page {
     id: prefPage
-    tools: prefTools
+    //tools: mainToolBar
     orientationLock: PageOrientation.LockPortrait
 
     Flickable {
@@ -75,20 +75,20 @@ Page {
         }
     }
 
-    ToolBarLayout {
-            id: prefTools
-            ToolIcon {
-                iconId: "toolbar-back";
-                onClicked: { appMenu.close(); pageStack.pop(); }
-            }
-            ToolButtonRow {
-                ToolButton {
-                    text:"Save"
-                    onClicked: {
-                        appcontroller.stepLength = stepLength.text;
-                        appcontroller.daily = daily.text * 1000.0;
-                    }
-                }
-            }
-        }
+//    ToolBarLayout {
+//            id: prefTools
+//            ToolIcon {
+//                iconId: "toolbar-back";
+//                onClicked: { appMenu.close(); pageStack.pop(); }
+//            }
+//            ToolButtonRow {
+//                ToolButton {
+//                    text:"Save"
+//                    onClicked: {
+//                        appcontroller.stepLength = stepLength.text;
+//                        appcontroller.daily = daily.text * 1000.0;
+//                    }
+//                }
+//            }
+//        }
 }
