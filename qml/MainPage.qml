@@ -171,14 +171,14 @@ Page {
 //        }
 //    }
 
-    Timer {
-        id:fakeSteps
-        interval: 500
-        running: appcontroller.running; repeat: true
-        onTriggered: {
-            appcontroller.steps++;
-        }
-    }
+//    Timer {
+//        id:fakeSteps
+//        interval: 500
+//        running: appcontroller.running; repeat: true
+//        onTriggered: {
+//            appcontroller.steps++;
+//        }
+//    }
     Timer {
         id: timer
 

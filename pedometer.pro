@@ -55,11 +55,13 @@ QMAKE_LFLAGS += -pie -rdynamic
 HEADERS += \
     appcontroller.h \
     historyentry.h \
-    stepsensor.h
+    stephandler.h
 
 contains(MEEGO_EDITION,harmattan) {
     icon.files = pedometer.png
     icon.path = /usr/share/icons/hicolor/80x80/apps
     INSTALLS += icon
 }
+
+
 

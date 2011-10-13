@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by Qt Creator 2.3.1, 2011-10-10T02:38:09. -->
+<!-- Written by Qt Creator 2.3.1, 2011-10-13T13:48:32. -->
 <qtcreator>
  <data>
   <variable>ProjectExplorer.Project.ActiveTarget</variable>
@@ -204,13 +204,17 @@
       <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.MaemoDeployStep</value>
       <valuelist type="QVariantList" key="Qt4ProjectManager.MaemoRunConfiguration.LastDeployedFiles">
        <value type="QString">/home/ink/workspace/programming/meego/pedometer-build-harmattan/pedometer_0_0_2_armel.deb</value>
+       <value type="QString">/home/ink/workspace/programming/meego/pedometer-build-harmattan/pedometer_0.0.4_armel.deb</value>
        <value type="QString">/home/ink/workspace/programming/meego/pedometer-build-harmattan/pedometer_0_0_1_armel.deb</value>
+       <value type="QString">/home/ink/workspace/programming/meego/pedometer-build-harmattan/pedometer_0.0.4_armel.deb</value>
        <value type="QString">/home/ink/workspace/programming/meego/pedometer-build-harmattan/pedometer_0.0.3_armel.deb</value>
        <value type="QString">/home/ink/workspace/programming/meego/pedometer-build-harmattan/pedometer_0.0.3_armel.deb</value>
       </valuelist>
       <valuelist type="QVariantList" key="Qt4ProjectManager.MaemoRunConfiguration.LastDeployedHosts">
        <value type="QString">localhost</value>
+       <value type="QString">192.168.1.9</value>
        <value type="QString">localhost</value>
+       <value type="QString">192.168.0.100</value>
        <value type="QString">192.168.0.100</value>
        <value type="QString">localhost</value>
       </valuelist>
@@ -219,10 +223,14 @@
        <value type="QString"></value>
        <value type="QString"></value>
        <value type="QString"></value>
+       <value type="QString"></value>
+       <value type="QString"></value>
       </valuelist>
       <valuelist type="QVariantList" key="Qt4ProjectManager.MaemoRunConfiguration.LastDeployedTimes">
        <value type="QDateTime">2011-09-22T20:55:05</value>
+       <value type="QDateTime">2011-10-11T16:09:46</value>
        <value type="QDateTime">2011-09-16T21:44:30</value>
+       <value type="QDateTime">2011-10-13T13:45:50</value>
        <value type="QDateTime">2011-10-09T14:27:05</value>
        <value type="QDateTime">2011-10-05T08:39:54</value>
       </valuelist>

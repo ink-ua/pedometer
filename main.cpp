@@ -4,11 +4,18 @@
 #include <QtSql/QSqlError>
 #include <QDebug>
 #include <QtSql/QSqlQuery>
+#include <QAccelerometer>
 
+#include "stephandler.h"
 #include "appcontroller.h"
 
 int main(int argc, char *argv[])
 {
+    QAccelerometer sensor;
+    sensor.setDataRate(100);
+    StepHandler filter;
+    sensor.addFilter(&filter);
+
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
     db.setDatabaseName("Pedometer");
     if(!db.open()) {
@@ -30,6 +37,7 @@ int main(int argc, char *argv[])
     }
 
     AppController * appController = new AppController(db);
+    QObject::connect(&filter, SIGNAL(onStep()), appController, SLOT(incStep()));
 
     QApplication app(argc, argv);
     QDeclarativeView view;
@@ -37,6 +45,7 @@ int main(int argc, char *argv[])
     view.rootContext()->setContextProperty("appcontroller", appController);
     view.rootContext()->setContextProperty("historyModel", QVariant::fromValue(appController->historyList));
     view.setSource(QUrl("qrc:/qml/main.qml"));
-    view.showFullScreen();
+    view.show();
+    sensor.start();
     return app.exec();
 }

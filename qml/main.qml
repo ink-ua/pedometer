@@ -7,7 +7,7 @@ PageStackWindow {
 //        inverted: true
 //    }
 
-    initialPage: Page {}
+    initialPage: Page { orientationLock: PageOrientation.LockPortrait }
 
     TabGroup {
           id: tabgroup
