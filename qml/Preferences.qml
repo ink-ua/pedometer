@@ -27,6 +27,11 @@ Page {
                 }
                 TextField {
                     id: stepLength
+                    onTextChanged: appcontroller.stepLength = stepLength.text
+                    validator: DoubleValidator {
+                        bottom: 0
+                        top: 2
+                    }
                     text: appcontroller.stepLength
                     anchors.verticalCenter: lblStep.verticalCenter
                 }
@@ -40,6 +45,11 @@ Page {
                 TextField {
                     id: daily
                     text: appcontroller.daily / 1000.0
+                    validator: DoubleValidator {
+                        bottom: 0
+                        top: 1000
+                    }
+                    onTextChanged: appcontroller.daily = daily.text * 1000.0
                     anchors.verticalCenter: lblDaily.verticalCenter
                 }
             }

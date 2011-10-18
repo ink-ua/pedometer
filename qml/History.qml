@@ -3,14 +3,29 @@ import com.meego 1.0
 
 Page {
     id: histPage
-    tools: histTools
+    //tools: histTools
     anchors.margins: 20
     orientationLock: PageOrientation.LockPortrait
+
+    ButtonRow {
+        id: buttonRow
+        anchors.top: parent.top
+        TabButton {
+            text: "Totals"
+            tab: total
+        }
+        TabButton {
+            text: "Daily"
+            tab: daily
+        }
+    }
 
     TabGroup {
           id: tabGroup
           currentTab: total
-
+          anchors.top: buttonRow.bottom
+          anchors.topMargin: 20
+          height: parent.height - buttonRow.height
           Item {
               id:total
               anchors.centerIn: parent
@@ -39,6 +54,12 @@ Page {
                       width:parent.width
                   }
                   InfoBox {
+                      id: totalCalories
+                      title: "Total calories"
+                      text: appcontroller.calTotal
+                      width:parent.width
+                  }
+                  InfoBox {
                       id: avgSpeed
                       title: "Average speed"
                       text: appcontroller.formatDistance((appcontroller.totalSteps * appcontroller.stepLength * 3600) / appcontroller.totalTime) + "/h"
@@ -49,14 +70,14 @@ Page {
 
           Item {
               id: daily
-              anchors.centerIn: parent
+              anchors.bottom: parent.bottom
               height: parent.height
               width: 430
               ListView {
                   id: listView
                   anchors.fill: parent
                   model: historyModel
-                  section.property: "date"
+                  section.property: "intMonth"
                   section.criteria: ViewSection.FullString
                   section.delegate: sectionHeading
                   delegate: Rectangle {
@@ -72,6 +93,11 @@ Page {
                           anchors.verticalCenter: parent.verticalCenter
                           anchors.left: parent.left
                           anchors.leftMargin: 10
+                          Label {
+                              text: day
+                              font.bold: true
+                              font.pixelSize: 40;
+                          }
                           Column {
                               Label {
                                   text: "Steps"
@@ -88,24 +114,6 @@ Page {
                               }
                               Label {
                                   text: time
-                              }
-                          }
-                          Column {
-                              Label {
-                                  text: "Distance"
-                                  font.bold: true
-                              }
-                              Label {
-                                  text: "1.00 km"
-                              }
-                          }
-                          Column {
-                              Label {
-                                  text: "Calories"
-                                  font.bold: true
-                              }
-                              Label {
-                                  text: "34.8"
                               }
                           }
                       }
@@ -133,29 +141,6 @@ Page {
                 anchors.centerIn: parent
                 text: section
                 font.bold: true
-            }
-        }
-    }
-
-    ToolBar {
-        anchors.top: parent.top
-        id: histTools
-        ToolBarLayout {
-
-            //        ToolIcon {
-            //            iconId: "toolbar-back";
-            //            onClicked: { appMenu.close(); pageStack.pop(); }
-            //        }
-            ButtonRow {
-                TabButton {
-                    text: "Totals"
-                    tab: total
-                }
-                TabButton {
-                    text: "Daily"
-                    tab: daily
-                }
-
             }
         }
     }

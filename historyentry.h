@@ -2,6 +2,7 @@
 #define HISTORYENTRY_H
 
 #include <QObject>
+#include <QDate>
 
 class HistoryEntry : public QObject
 {
@@ -9,11 +10,15 @@ class HistoryEntry : public QObject
 
     Q_PROPERTY(QString time READ getTime NOTIFY timeChanged)
     Q_PROPERTY(int steps READ getSteps NOTIFY stepsChanged)
-    Q_PROPERTY(QString date READ getDate NOTIFY dateChanged)
+    Q_PROPERTY(int day READ getDay NOTIFY dateChanged)
+    Q_PROPERTY(QString month READ getMonth NOTIFY dateChanged)
+    Q_PROPERTY(int intMonth READ getIntMonth NOTIFY dateChanged)
 
 public:
     HistoryEntry(QObject *parent=0) : QObject(parent) {}
     HistoryEntry(int time, int steps, QString date, QObject *parent=0)
+        : QObject(parent), m_time(time), m_steps(steps), m_date(QDate::fromString(date, "yyyy-MM-dd")) {}
+    HistoryEntry(int time, int steps, QDate date, QObject *parent=0)
         : QObject(parent), m_time(time), m_steps(steps), m_date(date) {}
 
     static QString formatTime(int seconds) {
@@ -34,8 +39,16 @@ public:
         return m_steps;
     }
 
-    QString getDate() {
-        return m_date;
+    int getDay() {
+        return m_date.day();
+    }
+
+    QString getMonth() {
+        return m_date.toString("MMM yyyy");
+    }
+
+    int getIntMonth() {
+        return m_date.month() + m_date.year() * 12;
     }
 
 signals:
@@ -46,6 +59,6 @@ signals:
 private:
     int m_time;
     int m_steps;
-    QString m_date;
+    QDate m_date;
 };
 #endif // HISTORYENTRY_H

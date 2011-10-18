@@ -8,10 +8,18 @@
 #include <QVariant>
 #include <QDebug>
 #include <QDate>
+#include <QAccelerometer>
+#include <QSettings>
+#include <QDate>
+#include <math.h>
 
 #include "historyentry.h"
 
+QTM_USE_NAMESPACE
+
 #define LAST_STEPS_TIME 10
+#define EPS 0.0001
+//#define NAN 0.0/0.0
 
 class AppController : public QObject
 {
@@ -29,27 +37,27 @@ class AppController : public QObject
     Q_PROPERTY(QString speed READ getSpeed NOTIFY speedChanged)
     Q_PROPERTY(double todayDistance READ getTodayDistance NOTIFY todayDistanceChanged)
     Q_PROPERTY(double cal READ getCal NOTIFY calChanged)
+    Q_PROPERTY(double calTotal READ getCalTotal NOTIFY calTotalChanged)
 
 public:
-    AppController(QSqlDatabase db) : m_running(true), m_db(db), m_seconds(0), m_steps(0), m_totalSteps(0), m_totalTime(0), m_lastSteps(0) {
-        QString sl = getVar("step_length");
-        m_stepLength = sl.isEmpty() ? 0.65 : sl.toDouble();
+    AppController(QSqlDatabase db, QAccelerometer* s) :
+        m_running(true), m_db(db), m_seconds(0), m_steps(0), m_totalSteps(0), m_totalTime(0),
+        m_lastSteps(0), sensor(s), settings("ink", "Pedometer") {
 
-        QString d = getVar("daily");
-        m_daily = d.isEmpty() ? 5000.0 : d.toDouble();
-
-        QString c = getVar("cal_per_step");
-        m_calPerStep = c.isEmpty() ? 0.03 : c.toDouble();
+        m_stepLength = settings.value("step_length", QVariant(0.7)).toDouble();
+        m_daily = settings.value("daily", QVariant(10000)).toDouble();
+        m_calPerStep = settings.value("cal_per_step", QVariant(0.03)).toDouble();
 
         QSqlQuery queryTodaySteps = m_db.exec("SELECT SUM(steps) FROM history WHERE date = (date('now'))");
         m_todaySteps = queryTodaySteps.next() ? queryTodaySteps.value(0).toInt() : 0;
 
-        QSqlQuery q = m_db.exec("SELECT seconds, steps, date FROM history ORDER BY date DESC");
+        QSqlQuery q = m_db.exec("SELECT sum(seconds), sum(steps), date FROM history GROUP BY date ORDER BY date DESC");
         while(q.next()) {
             int t = q.value(0).toInt();
             int s = q.value(1).toInt();            
             m_totalTime += t;
             m_totalSteps += s;
+           // qDebug() << q.value(2).toString();
             historyList.append(new HistoryEntry(t, s, q.value(2).toString()));
         }
         totalStepsChanged();
@@ -70,9 +78,10 @@ public:
         return m_stepLength;
     }
     void setStepLength(double sl) {
-        if(sl > 0) {
+        qDebug() << "step lenght diff" << fabs(sl - m_stepLength);
+        if(sl > 0 && fabs(sl - m_stepLength) > EPS) {
             m_stepLength = sl;
-            setVar("step_length", QString::number(sl));
+            settings.setValue("step_length", QVariant(sl));
             stepLengthChanged();
         }
     }
@@ -81,9 +90,9 @@ public:
         return m_daily;
     }
     void setDaily(double d) {
-        if(d > 0) {
+        if(d > 0 && abs(d - m_daily) > EPS) {
             m_daily = d;
-            setVar("daily", QString::number(m_daily));
+            settings.setValue("daily", QVariant(m_daily));
             dailyChanged();
         }
     }
@@ -94,6 +103,10 @@ public:
     void setRunning(bool r) {
         m_running = r;
         runningChanged();
+        if(r)
+            sensor->start();
+        else
+            sensor->stop();
     }
 
     int getTotalSteps() {
@@ -115,6 +128,10 @@ public:
 
     double getCal() {
         return m_steps * m_calPerStep;
+    }
+
+    double getCalTotal() {
+        return m_totalSteps * m_calPerStep;
     }
 
     int getSeconds() {
@@ -151,12 +168,13 @@ public:
             q.bindValue(":seconds", m_seconds);
             q.bindValue(":steps", m_steps);
             q.exec();
-            historyList.append(new HistoryEntry(m_seconds, m_steps, getCurrentDate()));
+            historyList.append(new HistoryEntry(m_seconds, m_steps, QDate::currentDate()));
             m_totalSteps += m_steps;
             m_todaySteps += m_steps;
             m_totalTime += m_seconds;
             totalStepsChanged();
             totalTimeChanged();
+            calTotalChanged();
         }
     }
 
@@ -187,6 +205,8 @@ public:
 
     Q_INVOKABLE QString formatDistance(double distance) {
         QString ret;
+        if(distance == NAN)
+            distance = 0;
         if(distance > 1000)
             ret.sprintf("%.2f km", distance / 1000.0);
         else
@@ -199,6 +219,7 @@ public:
     }
 
     QList<QObject*> historyList;
+
 public slots:
     void incStep() {
         setSteps(getSteps() + 1);
@@ -216,41 +237,8 @@ private:
     int m_todaySteps;
     double m_calPerStep;
     int m_lastSteps;
-
-    QString getVar(QString key) {
-        QSqlQuery query(m_db);
-        query.prepare("SELECT val FROM var WHERE key = :key");
-        query.bindValue(":key", key);
-        query.exec();
-
-        if(query.next()) {
-            QVariant v = query.value(0);
-            //qDebug() << "selected " + v.toString();
-            return v.toString();
-        }
-        else {
-            //qDebug("nothing selected");
-            return "";
-        }
-    }
-    void setVar(QString key, QString val) {
-        QSqlQuery query(m_db);
-        query.prepare("UPDATE var SET val = :val WHERE key = :key");
-        query.bindValue(":key", key);
-        query.bindValue(":val", val);
-        bool r = query.exec();
-        //qDebug() << "updated " << (r ? "true" : "false");
-
-        if(query.numRowsAffected() < 1) {
-            //qDebug() << "not modified, key: " + key + ", val: " + val;
-            QSqlQuery queryIns(m_db);
-            queryIns.prepare("INSERT INTO var (key, val) VALUES (:key, :val)");
-            queryIns.bindValue(":key", key);
-            queryIns.bindValue(":val", val);
-            bool res = queryIns.exec();
-            //qDebug() << "inserted " << (res ? "true" : "false");
-        }
-    }
+    QAccelerometer *sensor;
+    QSettings settings;
 
 signals:
      void runningChanged();
@@ -265,5 +253,6 @@ signals:
      void todayDistanceChanged();
      void calChanged();
      void speedChanged();
+     void calTotalChanged();
 };
 #endif // APPCONTROLLER_H

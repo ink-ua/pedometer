@@ -5,38 +5,36 @@
 #include <QDebug>
 #include <QtSql/QSqlQuery>
 #include <QAccelerometer>
+#include <QDesktopServices>
 
 #include "stephandler.h"
 #include "appcontroller.h"
 
+#define APP_NAME "Pedometer"
+#define SQLITE_V ".sqlite3"
+
 int main(int argc, char *argv[])
 {
     QAccelerometer sensor;
-    sensor.setDataRate(100);
+    sensor.setDataRate(10);
     StepHandler filter;
     sensor.addFilter(&filter);
 
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName("Pedometer");
-    if(!db.open()) {
-        qDebug() << db.lastError().number();
-        return 1;
-    }
+    QString baseDataPath = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+    qDebug() << baseDataPath;
+    db.setDatabaseName(baseDataPath + APP_NAME + "/pedometer" + SQLITE_V);
+    if(!db.open())
+        qDebug() << "Error opening database:" << db.lastError().number();
 
-//    db.exec("DROP TABLE var");
 //    db.exec("DROP TABLE history");
 
-    if(!db.tables().contains("var")) {
-        QSqlQuery query(db);
-        bool r = query.exec("CREATE TABLE var(key VARCHAR(64) NOT NULL PRIMARY KEY, val TEXT NOT NULL)");
-        qDebug() << "create var " << (r ? "true" : "false");
-    }
     if(!db.tables().contains("history")) {
         qDebug("create history");
         db.exec("CREATE TABLE history(id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, seconds INTEGER NOT NULL, steps INTEGER NOT NULL, date DATE NOT NULL DEFAULT (date('now')))");
     }
 
-    AppController * appController = new AppController(db);
+    AppController * appController = new AppController(db, &sensor);
     QObject::connect(&filter, SIGNAL(onStep()), appController, SLOT(incStep()));
 
     QApplication app(argc, argv);
