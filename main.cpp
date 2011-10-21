@@ -22,7 +22,8 @@ int main(int argc, char *argv[])
 
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
     QString baseDataPath = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
-    qDebug() << baseDataPath;
+    // FIXME create dir if not exists
+    //qDebug() << baseDataPath;
     db.setDatabaseName(baseDataPath + APP_NAME + "/pedometer" + SQLITE_V);
     if(!db.open())
         qDebug() << "Error opening database:" << db.lastError().number();
@@ -43,7 +44,7 @@ int main(int argc, char *argv[])
     view.rootContext()->setContextProperty("appcontroller", appController);
     view.rootContext()->setContextProperty("historyModel", QVariant::fromValue(appController->historyList));
     view.setSource(QUrl("qrc:/qml/main.qml"));
-    view.show();
+    view.showFullScreen();
     sensor.start();
     return app.exec();
 }

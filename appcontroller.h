@@ -78,7 +78,7 @@ public:
         return m_stepLength;
     }
     void setStepLength(double sl) {
-        qDebug() << "step lenght diff" << fabs(sl - m_stepLength);
+        //qDebug() << sl;
         if(sl > 0 && fabs(sl - m_stepLength) > EPS) {
             m_stepLength = sl;
             settings.setValue("step_length", QVariant(sl));

@@ -1,16 +1,14 @@
 import QtQuick 1.1
-import com.meego 1.0
+import com.nokia.meego 1.0
 
 Page {
     id: mainPage
-    //tools: mainToolBar
     orientationLock: PageOrientation.LockPortrait
 
     Column {
         anchors.top: parent.top
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.margins: 10
-        anchors.topMargin: 40
         spacing: 5
         Row {
             spacing: 5
@@ -128,9 +126,6 @@ Page {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.topMargin: 30
         exclusive: false
-//        platformStyle: ButtonStyle {
-//            inverted: true
-//        }
         Button {
             iconSource: "image://theme/icon-m-" + (appcontroller.running ? "toolbar-mediacontrol-pause" : "toolbar-mediacontrol-play")
             onClicked: appcontroller.running = !appcontroller.running
@@ -147,38 +142,6 @@ Page {
         }
     }
 
-//    ToolBarLayout {
-//        id: buttonTools
-//        //            ToolIcon {
-//        //                visible: false
-//        //                iconId: "toolbar-back";
-//        //                onClicked: { appMenu.close(); pageStack.pop(); }
-//        //            }
-//        ToolIcon {
-//            id: btnStop
-//            platformIconId: appcontroller.running ? "toolbar-mediacontrol-pause" : "toolbar-mediacontrol-play";
-//            //anchors.right: parent === undefined ? undefined : parent.right
-//            onClicked: appcontroller.running = !appcontroller.running;
-//        }
-//        ToolIcon {
-//            platformIconId: "toolbar-mediacontrol-stop"
-//            onClicked: appcontroller.reset()
-//        }
-//        ToolIcon {
-//            platformIconId: "toolbar-view-menu";
-//            anchors.right: parent === undefined ? undefined : parent.right
-//            onClicked: (appMenu.status == DialogStatus.Closed) ? appMenu.open() : appMenu.close()
-//        }
-//    }
-
-//    Timer {
-//        id:fakeSteps
-//        interval: 500
-//        running: appcontroller.running; repeat: true
-//        onTriggered: {
-//            appcontroller.steps++;
-//        }
-//    }
     Timer {
         id: timer
 

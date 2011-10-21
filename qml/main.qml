@@ -1,27 +1,21 @@
 import QtQuick 1.1
-import com.meego 1.0
+import com.nokia.meego 1.0
 
 PageStackWindow {
     id: appWindow
-//    platformStyle: PageStackWindowStyle {
-//        inverted: true
-//    }
+    initialPage: Page {
+        orientationLock: PageOrientation.LockPortrait
+        TabGroup {
+            id: tabgroup
+            currentTab: mainPage
+            MainPage { id: mainPage }
+            History { id: histPage }
+            Preferences { id: prefPage }
+        }
 
-    initialPage: Page { orientationLock: PageOrientation.LockPortrait }
-
-    TabGroup {
-          id: tabgroup
-          currentTab: mainPage
-          MainPage { id: mainPage }
-          History { id: histPage }
-          Preferences { id: prefPage }
-    }
-
-    ToolBar {
-        id: mainToolBar
-        anchors.bottom: parent.bottom
         tools: ToolBarLayout {
             id: tools
+            anchors.bottom: parent.bottom
             ButtonRow {
                 TabButton {
                     iconSource: "qrc:/human.png"
@@ -38,4 +32,12 @@ PageStackWindow {
             }
         }
     }
+//    ToolBarLayout {
+//        visible: false
+//    }
+//    ToolBar {
+//        id: mainToolBar
+//        anchors.bottom: parent.bottom
+//        tools:
+//    }
 }

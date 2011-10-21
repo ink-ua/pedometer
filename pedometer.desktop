@@ -2,9 +2,9 @@
 Encoding=UTF-8
 Version=1.0
 Type=Application
-Terminal=true
+Terminal=false
 Name=Pedometer
-Exec=/opt/pedometer/bin/pedometer
+Exec=invoker --type=e --single-instance /opt/pedometer/bin/pedometer
 Icon=/usr/share/icons/hicolor/80x80/apps/pedometer.png
 X-Window-Icon=
 X-HildonDesk-ShowInToolbar=true

@@ -1,24 +1,10 @@
 import QtQuick 1.0
-import com.meego 1.0
+import com.nokia.meego 1.0
 
 Page {
     id: histPage
-    //tools: histTools
-    anchors.margins: 20
+    //anchors.margins: 20
     orientationLock: PageOrientation.LockPortrait
-
-    ButtonRow {
-        id: buttonRow
-        anchors.top: parent.top
-        TabButton {
-            text: "Totals"
-            tab: total
-        }
-        TabButton {
-            text: "Daily"
-            tab: daily
-        }
-    }
 
     TabGroup {
           id: tabGroup
@@ -98,29 +84,32 @@ Page {
                               font.bold: true
                               font.pixelSize: 40;
                           }
-                          Column {
-                              Label {
-                                  text: "Steps"
-                                  font.bold: true
-                              }
-                              Label {
-                                  text: steps
-                              }
+                          Label {
+                              text: steps + " steps for " + time
                           }
-                          Column {
-                              Label {
-                                  text: "Time"
-                                  font.bold: true
-                              }
-                              Label {
-                                  text: time
-                              }
-                          }
+//                          Column {
+//                              Label {
+//                                  text: "Steps"
+//                                  font.bold: true
+//                              }
+//                              Label {
+//                                  text: steps
+//                              }
+//                          }
+//                          Column {
+//                              Label {
+//                                  text: "Time"
+//                                  font.bold: true
+//                              }
+//                              Label {
+//                                  text: time
+//                              }
+//                          }
                       }
                   }
               }
-              ScrollDecorator {
-                  flickableItem: listView
+              SectionScroller {
+                  listView: listView
               }
           }
     }
@@ -142,6 +131,19 @@ Page {
                 text: section
                 font.bold: true
             }
+        }
+    }
+
+    ButtonRow {
+        id: buttonRow
+        anchors.top: parent.top
+        TabButton {
+            text: "Totals"
+            tab: total
+        }
+        TabButton {
+            text: "Daily"
+            tab: daily
         }
     }
 }

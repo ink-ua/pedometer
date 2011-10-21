@@ -1,104 +1,92 @@
 import QtQuick 1.0
-import com.meego 1.0
+import com.nokia.meego 1.0
 
 Page {
     id: prefPage
-    //tools: mainToolBar
     orientationLock: PageOrientation.LockPortrait
 
-    Flickable {
-        id: flickable
-        anchors.centerIn: parent
-        flickableDirection: Flickable.HorizontalFlick
-        anchors.topMargin: 10
-        anchors.leftMargin: 10
+//    Label {
+//        id: title
+//        anchors.top: parent.top
+//        text: "<hr>Preferenses"
+//    }
 
+    LabelStyle {
+        id: prefLabel
+        fontPixelSize: 30
+    }
+
+    Column {
+        spacing: 30
+        anchors.margins: 30
+        anchors.top: parent.top
         Column {
             spacing: 10
-            anchors.centerIn: parent
-            Row {
-                spacing: 10
-                Label {
-                    id:lblStep
-                    text: "Step length (m) "
-//                    platformStyle: LabelStyle {
-//                        textColor: "white"
-//                    }
-                }
-                TextField {
-                    id: stepLength
-                    onTextChanged: appcontroller.stepLength = stepLength.text
-                    validator: DoubleValidator {
-                        bottom: 0
-                        top: 2
-                    }
-                    text: appcontroller.stepLength
-                    anchors.verticalCenter: lblStep.verticalCenter
-                }
+            Label {
+                id:lblStep
+                text: "Step length (m) "
+                platformStyle: prefLabel
             }
-            Row {
-                spacing: 10
-                Label {
-                    id:lblDaily
-                    text: "Daily distance (km) "
+            TextField {
+                id: stepLength
+                onTextChanged: appcontroller.stepLength = stepLength.text
+                inputMethodHints: Qt.ImhDigitsOnly
+                validator: DoubleValidator {
+                    bottom: 0
+                    top: 2
                 }
-                TextField {
-                    id: daily
-                    text: appcontroller.daily / 1000.0
-                    validator: DoubleValidator {
-                        bottom: 0
-                        top: 1000
-                    }
-                    onTextChanged: appcontroller.daily = daily.text * 1000.0
-                    anchors.verticalCenter: lblDaily.verticalCenter
-                }
+                text: appcontroller.stepLength
+                //anchors.verticalCenter: lblStep.verticalCenter
             }
-            Row {
-                spacing: 10
-                Label {
-                    id:lblStop
-                    text: "Pause when stop walking"
-                }
-                Switch {
-                    id: stop
-                    checked: appcontroller.pauseWalking
-                    anchors.verticalCenter: lblStop.verticalCenter
-                }
+        }
+        Column {
+            spacing: 10
+            Label {
+                id:lblDaily
+                text: "Daily distance (km) "
+                platformStyle: prefLabel
             }
-            Row {
-                spacing: 10
-                Label {
-                    id:lblSense
-                    text: "Sensetivity "
+            TextField {
+                id: daily
+                text: appcontroller.daily / 1000.0
+                inputMethodHints: Qt.ImhDigitsOnly
+                validator: DoubleValidator {
+                    bottom: 0
+                    top: 1000
                 }
-                Slider {
-                    id: sense
-                    stepSize: 0.1
-                    valueIndicatorVisible: true
-                    value: 0.75
-                    minimumValue: 0
-                    maximumValue: 1
-                    width: 200
-                    anchors.verticalCenter: lblSense.verticalCenter
-                }
+                onTextChanged: appcontroller.daily = daily.text * 1000.0
+                //anchors.verticalCenter: lblDaily.verticalCenter
+            }
+        }
+        //            Row {
+        //                spacing: 10
+        //                Label {
+        //                    id:lblStop
+        //                    text: "Pause when stop walking"
+        //                }
+        //                Switch {
+        //                    id: stop
+        //                    checked: appcontroller.pauseWalking
+        //                    anchors.verticalCenter: lblStop.verticalCenter
+        //                }
+        //            }
+        Column {
+            spacing: 10
+            Label {
+                id:lblSense
+                text: "Sensetivity "
+                platformStyle: prefLabel
+            }
+            Slider {
+                id: sense
+                stepSize: 0.05
+                valueIndicatorVisible: true
+                value: 0.75
+                minimumValue: 0
+                maximumValue: 1
+                width: 400
+                //anchors.verticalCenter: lblSense.verticalCenter
             }
         }
     }
-
-//    ToolBarLayout {
-//            id: prefTools
-//            ToolIcon {
-//                iconId: "toolbar-back";
-//                onClicked: { appMenu.close(); pageStack.pop(); }
-//            }
-//            ToolButtonRow {
-//                ToolButton {
-//                    text:"Save"
-//                    onClicked: {
-//                        appcontroller.stepLength = stepLength.text;
-//                        appcontroller.daily = daily.text * 1000.0;
-//                    }
-//                }
-//            }
-//        }
 }
