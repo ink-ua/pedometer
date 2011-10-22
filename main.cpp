@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
     StepHandler filter;
     sensor.addFilter(&filter);
     QObject::connect(&filter, SIGNAL(onStep()), appController, SLOT(incStep()));
-    QObject::connect(appController, SIGNAL(sensitivityChanged()), &filter, SLOT(updateSensitivity()));
+    //QObject::connect(appController, SIGNAL(sensitivityChanged()), &filter, SLOT(updateSensitivity()));
 
     QApplication app(argc, argv);
     QDeclarativeView view;
@@ -48,5 +48,8 @@ int main(int argc, char *argv[])
     view.setSource(QUrl("qrc:/qml/main.qml"));
     view.showFullScreen();
     sensor.start();
+
+    QObject::connect(&app, SIGNAL(lastWindowClosed()), appController, SLOT(onClose()));
+
     return app.exec();
 }

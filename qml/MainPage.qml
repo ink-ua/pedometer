@@ -62,13 +62,13 @@ Page {
 
     Rectangle {
         id: today
-        color: "#888888" //"#ddd8dd"
+        color: "#888888"
         border.width: 1
         radius: 10
         opacity: 0.8
         anchors.top: colMain.bottom
         anchors.horizontalCenter: parent.horizontalCenter
-        anchors.topMargin: 60
+        anchors.topMargin: 50
         width: step.width
         height: 50
         Row {
@@ -144,7 +144,6 @@ Page {
 
     Timer {
         id: timer
-
         interval: 1000
         running: appcontroller.running; repeat: true
         onTriggered: {

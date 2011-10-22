@@ -31,8 +31,20 @@ public:
         return ret;
     }
 
+    QDate getDate() {
+        return m_date;
+    }
+
     QString getTime() const {
         return formatTime(m_time);
+    }
+
+    void plusTime(int s) {
+        m_time += s;
+    }
+
+    void plusSteps(int s) {
+        m_steps += s;
     }
 
     int getSteps() {

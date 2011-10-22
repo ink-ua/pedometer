@@ -25,7 +25,7 @@ Page {
             spacing: 10
             Label {
                 id:lblStep
-                text: "Step length (m) "
+                text: "Step length (m)"
                 platformStyle: prefLabel
             }
             TextField {
@@ -44,7 +44,7 @@ Page {
             spacing: 10
             Label {
                 id:lblDaily
-                text: "Daily distance (km) "
+                text: "Daily distance (km)"
                 platformStyle: prefLabel
             }
             TextField {
@@ -74,18 +74,18 @@ Page {
         Column {
             spacing: 10
             Label {
-                id:lblSense
-                text: "Sensetivity "
+                id:lblSens
+                text: "Sensetivity"
                 platformStyle: prefLabel
             }
             Slider {
-                id: sense
+                id: sens
                 stepSize: 0.05
                 valueIndicatorVisible: true
-                value: appcontroller.sensitivity
-                minimumValue: 0
-                maximumValue: 1
-                width: 400
+                minimumValue: 0.0
+                maximumValue: 1.0
+                value: appcontroller.sensitivity                
+                width: 300
                 onValueChanged: appcontroller.sensitivity = value
                 //anchors.verticalCenter: lblSense.verticalCenter
             }

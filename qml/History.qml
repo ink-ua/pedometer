@@ -63,7 +63,7 @@ Page {
               ListView {
                   id: listView
                   anchors.fill: parent
-                  model: historyModel
+                  model: historyModel //appcontroller.history
                   section.property: "month" //"intMonth"
                   section.criteria: ViewSection.FullString
                   section.delegate: sectionHeading

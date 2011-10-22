@@ -38,6 +38,7 @@ class AppController : public QObject
     Q_PROPERTY(double cal READ getCal NOTIFY calChanged)
     Q_PROPERTY(double calTotal READ getCalTotal NOTIFY calTotalChanged)
     Q_PROPERTY(double sensitivity READ getSensitivity WRITE setSensitivity NOTIFY sensitivityChanged)
+    //Q_PROPERTY(QList history READ getHistory NOTIFY historyChanged)
 
 public:
     AppController(QSqlDatabase db, QAccelerometer* s) :
@@ -52,14 +53,16 @@ public:
         QSqlQuery queryTodaySteps = m_db.exec("SELECT SUM(steps) FROM history WHERE date = (date('now'))");
         m_todaySteps = queryTodaySteps.next() ? queryTodaySteps.value(0).toInt() : 0;
 
+        QString date;
         QSqlQuery q = m_db.exec("SELECT sum(seconds), sum(steps), date FROM history GROUP BY date ORDER BY date DESC");
         while(q.next()) {
             int t = q.value(0).toInt();
-            int s = q.value(1).toInt();            
+            int s = q.value(1).toInt();
+            date = q.value(2).toString();
             m_totalTime += t;
             m_totalSteps += s;
-           // qDebug() << q.value(2).toString();
-            historyList.append(new HistoryEntry(t, s, q.value(2).toString()));
+            qDebug() << t << s << date;
+            historyList.append(new HistoryEntry(t, s, date));
         }
         totalStepsChanged();
         totalTimeChanged();
@@ -79,7 +82,7 @@ public:
         return m_sensitivity;
     }
     void setSensitivity(double s) {
-        if(s > 0 && fabs(s - m_sensitivity) > EPS) {
+        if(s > 0) {
             m_sensitivity = s;
             settings.setValue("sensitivity", QVariant(s));
             emit sensitivityChanged();
@@ -90,7 +93,6 @@ public:
         return m_stepLength;
     }
     void setStepLength(double sl) {
-        //qDebug() << sl;
         if(sl > 0 && fabs(sl - m_stepLength) > EPS) {
             m_stepLength = sl;
             settings.setValue("step_length", QVariant(sl));
@@ -160,7 +162,9 @@ public:
     }
 
     QString getAvgSpeed() {
-        double speed = (m_steps * m_stepLength * 3600) / m_seconds;
+        double speed = 0;
+        if(m_seconds != 0)
+            speed = (m_steps * m_stepLength * 3600) / m_seconds;
         return formatDistance(speed) + "/h";
     }
 
@@ -180,13 +184,25 @@ public:
             q.bindValue(":seconds", m_seconds);
             q.bindValue(":steps", m_steps);
             q.exec();
-            historyList.append(new HistoryEntry(m_seconds, m_steps, QDate::currentDate()));
+
+            QDate currentDate = QDate::currentDate();
+            bool found = false;
+            for(int i = 0; i < historyList.length(); i++)
+                if(((HistoryEntry*)historyList.at(i))->getDate() == currentDate) {
+                    ((HistoryEntry*)historyList.at(i))->plusTime(m_seconds);
+                    ((HistoryEntry*)historyList.at(i))->plusSteps(m_steps);
+                    found = true;
+                }
+            if(!found)
+                historyList.append(new HistoryEntry(m_seconds, m_steps, currentDate));
+
             m_totalSteps += m_steps;
             m_todaySteps += m_steps;
             m_totalTime += m_seconds;
             totalStepsChanged();
             totalTimeChanged();
             calTotalChanged();
+            //historyChanged();
         }
     }
 
@@ -217,8 +233,6 @@ public:
 
     Q_INVOKABLE QString formatDistance(double distance) {
         QString ret;
-        if(distance == NAN)
-            distance = 0;
         if(distance > 1000)
             ret.sprintf("%.2f km", distance / 1000.0);
         else
@@ -230,11 +244,19 @@ public:
         return m_steps * m_stepLength;
     }
 
+//    QList<QObject*> getHistory() {
+//        return historyList;
+//    }
+
     QList<QObject*> historyList;
 
 public slots:
     void incStep() {
         setSteps(getSteps() + 1);
+    }
+    void onClose() {
+        save();
+        delete this;
     }
 
 private:
@@ -268,5 +290,6 @@ signals:
      void speedChanged();
      void calTotalChanged();
      void sensitivityChanged();
+     //void historyChanged();
 };
 #endif // APPCONTROLLER_H
