@@ -19,7 +19,6 @@ QTM_USE_NAMESPACE
 
 #define LAST_STEPS_TIME 10
 #define EPS 0.0001
-//#define NAN 0.0/0.0
 
 class AppController : public QObject
 {
@@ -38,6 +37,7 @@ class AppController : public QObject
     Q_PROPERTY(double todayDistance READ getTodayDistance NOTIFY todayDistanceChanged)
     Q_PROPERTY(double cal READ getCal NOTIFY calChanged)
     Q_PROPERTY(double calTotal READ getCalTotal NOTIFY calTotalChanged)
+    Q_PROPERTY(double sensitivity READ getSensitivity WRITE setSensitivity NOTIFY sensitivityChanged)
 
 public:
     AppController(QSqlDatabase db, QAccelerometer* s) :
@@ -47,6 +47,7 @@ public:
         m_stepLength = settings.value("step_length", QVariant(0.7)).toDouble();
         m_daily = settings.value("daily", QVariant(10000)).toDouble();
         m_calPerStep = settings.value("cal_per_step", QVariant(0.03)).toDouble();
+        m_sensitivity = settings.value("sensitivity", QVariant(0.75)).toDouble();
 
         QSqlQuery queryTodaySteps = m_db.exec("SELECT SUM(steps) FROM history WHERE date = (date('now'))");
         m_todaySteps = queryTodaySteps.next() ? queryTodaySteps.value(0).toInt() : 0;
@@ -72,6 +73,17 @@ public:
     double getTodayDistance() {
         double today = (m_todaySteps + m_steps) * m_stepLength;
         return today;
+    }
+
+    double getSensitivity() {
+        return m_sensitivity;
+    }
+    void setSensitivity(double s) {
+        if(s > 0 && fabs(s - m_sensitivity) > EPS) {
+            m_sensitivity = s;
+            settings.setValue("sensitivity", QVariant(s));
+            emit sensitivityChanged();
+        }
     }
 
     double getStepLength() {
@@ -239,6 +251,7 @@ private:
     int m_lastSteps;
     QAccelerometer *sensor;
     QSettings settings;
+    double m_sensitivity;
 
 signals:
      void runningChanged();
@@ -254,5 +267,6 @@ signals:
      void calChanged();
      void speedChanged();
      void calTotalChanged();
+     void sensitivityChanged();
 };
 #endif // APPCONTROLLER_H

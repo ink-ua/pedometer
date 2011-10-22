@@ -20,6 +20,7 @@ Page {
         spacing: 30
         anchors.margins: 30
         anchors.top: parent.top
+        anchors.left: parent.left
         Column {
             spacing: 10
             Label {
@@ -81,10 +82,11 @@ Page {
                 id: sense
                 stepSize: 0.05
                 valueIndicatorVisible: true
-                value: 0.75
+                value: appcontroller.sensitivity
                 minimumValue: 0
                 maximumValue: 1
                 width: 400
+                onValueChanged: appcontroller.sensitivity = value
                 //anchors.verticalCenter: lblSense.verticalCenter
             }
         }

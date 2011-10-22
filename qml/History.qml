@@ -57,35 +57,76 @@ Page {
           Item {
               id: daily
               anchors.bottom: parent.bottom
+              anchors.horizontalCenter: parent.horizontalCenter
               height: parent.height
-              width: 430
+              width: 450
               ListView {
                   id: listView
                   anchors.fill: parent
                   model: historyModel
-                  section.property: "intMonth"
+                  section.property: "month" //"intMonth"
                   section.criteria: ViewSection.FullString
                   section.delegate: sectionHeading
-                  delegate: Rectangle {
-                      height: 50
+                  delegate: Item {
+                      height: 70
                       anchors.left: parent.left
-                      anchors.leftMargin: 10
+                      anchors.leftMargin: 5
                       anchors.right: parent.right
-                      anchors.rightMargin: 20
-                      color: "lightyellow"
-                      border.width: 1
+                      anchors.rightMargin: 5
+                      //color: "lightyellow"
+                      //border.width: 1
                       Row {
-                          spacing: 10
+                          spacing: 0
                           anchors.verticalCenter: parent.verticalCenter
                           anchors.left: parent.left
-                          anchors.leftMargin: 10
-                          Label {
-                              text: day
-                              font.bold: true
-                              font.pixelSize: 40;
+                          Rectangle {
+                              height: 70
+                              width: 70
+                              color: "lightyellow"
+                              border.width: 1
+                              Label {
+                                  id: dayLabel
+                                  anchors.centerIn: parent
+                                  text: day
+                                  font.bold: true
+                                  font.pixelSize: 50
+                              }
                           }
-                          Label {
-                              text: steps + " steps for " + time
+                          Rectangle {
+                              height: 70
+                              width: 360
+                              color: "lightyellow"
+                              border.width: 1
+                              Row {
+                                  spacing: 8
+                                  anchors.centerIn: parent
+                                  Label {
+                                      text: steps
+                                      font.pixelSize: 30
+                                      font.bold: true
+                                      style: LabelStyle {
+                                          textColor: {
+                                            var green = parseInt((steps * appcontroller.stepLength) / (appcontroller.daily / 0xFF));
+                                            var red = 0;
+                                            if(green > 0xFF)
+                                                green = 0xFF;
+                                            else
+                                                red = 0xFF - green;
+                                            return "#" + (red <= 0xF ? "0" : "") + red.toString(16) + (green <= 0xF ? "0" : "") + green.toString(16) + "00";
+                                          }
+                                      }
+                                  }
+                                  Label {
+                                      text: "steps for"
+                                      font.pixelSize: 28
+                                      style: LabelStyle { textColor: "#555555" }
+                                  }
+                                  Label {
+                                      text: time
+                                      font.pixelSize: 30
+                                      font.bold: true
+                                  }
+                              }
                           }
 //                          Column {
 //                              Label {
@@ -137,6 +178,8 @@ Page {
     ButtonRow {
         id: buttonRow
         anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
         TabButton {
             text: "Totals"
             tab: total
