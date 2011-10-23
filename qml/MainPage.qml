@@ -65,7 +65,7 @@ Page {
         color: "#888888"
         border.width: 1
         radius: 10
-        opacity: 0.8
+        //activeFocus: opacity: 0.8
         anchors.top: colMain.bottom
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.topMargin: 50
@@ -127,14 +127,14 @@ Page {
         anchors.topMargin: 30
         exclusive: false
         Button {
-            iconSource: "image://theme/icon-m-" + (appcontroller.running ? "toolbar-mediacontrol-pause" : "toolbar-mediacontrol-play")
+            iconSource: "image://theme/icon-m-" + (appcontroller.running ? "toolbar-mediacontrol-pause" : "toolbar-mediacontrol-play") + (appcontroller.inverted ? "-white" : "")
             onClicked: appcontroller.running = !appcontroller.running
             platformStyle: ButtonStyle {
                 buttonHeight: 80
             }
         }
         Button {
-            iconSource: "image://theme/icon-m-toolbar-mediacontrol-stop"
+            iconSource: "image://theme/icon-m-toolbar-mediacontrol-stop" + (appcontroller.inverted ? "-white" : "")
             onClicked: appcontroller.reset()
             platformStyle: ButtonStyle {
                 buttonHeight: 80

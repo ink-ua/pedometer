@@ -14,6 +14,7 @@
 #include <math.h>
 
 #include "historyentry.h"
+#include "historymodel.h"
 
 QTM_USE_NAMESPACE
 
@@ -38,7 +39,7 @@ class AppController : public QObject
     Q_PROPERTY(double cal READ getCal NOTIFY calChanged)
     Q_PROPERTY(double calTotal READ getCalTotal NOTIFY calTotalChanged)
     Q_PROPERTY(double sensitivity READ getSensitivity WRITE setSensitivity NOTIFY sensitivityChanged)
-    //Q_PROPERTY(QList history READ getHistory NOTIFY historyChanged)
+    Q_PROPERTY(bool inverted READ getInverted WRITE setInverted NOTIFY invertedChanged)
 
 public:
     AppController(QSqlDatabase db, QAccelerometer* s) :
@@ -49,6 +50,7 @@ public:
         m_daily = settings.value("daily", QVariant(10000)).toDouble();
         m_calPerStep = settings.value("cal_per_step", QVariant(0.03)).toDouble();
         m_sensitivity = settings.value("sensitivity", QVariant(0.75)).toDouble();
+        m_inverted = settings.value("theme_inverted", QVariant(false)).toBool();
 
         QSqlQuery queryTodaySteps = m_db.exec("SELECT SUM(steps) FROM history WHERE date = (date('now'))");
         m_todaySteps = queryTodaySteps.next() ? queryTodaySteps.value(0).toInt() : 0;
@@ -61,9 +63,9 @@ public:
             date = q.value(2).toString();
             m_totalTime += t;
             m_totalSteps += s;
-            qDebug() << t << s << date;
+            //qDebug() << t << s << date;
             HistoryEntry* h = new HistoryEntry(t, s, date);
-            historyList.insert(h->hash(), h);
+            history.insert(h);
         }
         totalStepsChanged();
         totalTimeChanged();
@@ -83,7 +85,7 @@ public:
         return m_sensitivity;
     }
     void setSensitivity(double s) {
-        if(s > 0) {
+        if(s > 0 && fabs(m_sensitivity - s) > EPS) {
             m_sensitivity = s;
             settings.setValue("sensitivity", QVariant(s));
             emit sensitivityChanged();
@@ -116,12 +118,14 @@ public:
         return m_running;
     }
     void setRunning(bool r) {
-        m_running = r;
-        runningChanged();
-        if(r)
-            sensor->start();
-        else
-            sensor->stop();
+        if(r != m_running) {
+            m_running = r;
+            runningChanged();
+            if(r)
+                sensor->start();
+            else
+                sensor->stop();
+        }
     }
 
     int getTotalSteps() {
@@ -187,14 +191,13 @@ public:
             q.exec();
 
             QDate currentDate = QDate::currentDate();
-            int hash = HistoryEntry::hash(currentDate);
-            if(historyList.contains(hash))  {
-                HistoryEntry* h = (HistoryEntry*)historyList.value(hash);
-                h->plusTime(m_seconds);
-                h->plusSteps(m_steps);
+            HistoryEntry* first;
+            if(history.rowCount() > 0 && (first = (HistoryEntry*)history.get(0))->getDate() == currentDate) {
+                first->plusSteps(m_steps);
+                first->plusTime(m_seconds);
             }
             else
-                historyList.insert(hash, new HistoryEntry(m_seconds, m_steps, currentDate));
+                history.insert(new HistoryEntry(m_seconds, m_steps, currentDate));
 
             m_totalSteps += m_steps;
             m_todaySteps += m_steps;
@@ -202,7 +205,6 @@ public:
             totalStepsChanged();
             totalTimeChanged();
             calTotalChanged();
-            //historyChanged();
         }
     }
 
@@ -244,11 +246,17 @@ public:
         return m_steps * m_stepLength;
     }
 
-//    QList<QObject*> getHistory() {
-//        return historyList;
-//    }
+    bool getInverted() {
+        return m_inverted;
+    }
+    void setInverted(bool i) {
+        if(i != m_inverted) {
+            m_inverted = i;
+            emit invertedChanged();
+        }
+    }
 
-    QHash<int, QObject*> historyList;
+    HistoryModel history;
 
 public slots:
     void incStep() {
@@ -273,6 +281,7 @@ private:
     QAccelerometer *sensor;
     QSettings settings;
     double m_sensitivity;
+    bool m_inverted;
 
 signals:
      void runningChanged();
@@ -289,6 +298,6 @@ signals:
      void speedChanged();
      void calTotalChanged();
      void sensitivityChanged();
-     //void historyChanged();
+     void invertedChanged();
 };
 #endif // APPCONTROLLER_H

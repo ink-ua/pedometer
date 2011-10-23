@@ -18,26 +18,21 @@ PageStackWindow {
             anchors.bottom: parent.bottom
             ButtonRow {
                 TabButton {
-                    iconSource: "qrc:/human.png"
+                    iconSource: "qrc:/human" + (appcontroller.inverted ? "-white.png" : ".png")
                     tab: mainPage
                 }
                 TabButton {
-                    iconSource: "image://theme/icon-m-toolbar-history"
+                    iconSource: "image://theme/icon-m-toolbar-history" + (appcontroller.inverted ? "-white" : "")
                     tab: histPage
                 }
-                TabButton {
-                    iconSource: "image://theme/icon-m-toolbar-settings"
+                TabButton {                    
+                    iconSource: "image://theme/icon-m-toolbar-settings" + (appcontroller.inverted ? "-white" : "")
                     tab: prefPage
                 }
             }
         }
     }
-//    ToolBarLayout {
-//        visible: false
-//    }
-//    ToolBar {
-//        id: mainToolBar
-//        anchors.bottom: parent.bottom
-//        tools:
-//    }
+    Component.onCompleted: {
+        theme.inverted = appcontroller.inverted
+    }
 }

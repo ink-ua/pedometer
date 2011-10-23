@@ -1,10 +1,8 @@
 import QtQuick 1.0
 import com.nokia.meego 1.0
-//import com.nokia.extras 1.1
 
 Page {
     id: histPage
-    //anchors.margins: 20
     orientationLock: PageOrientation.LockPortrait
 
     TabGroup {
@@ -12,7 +10,7 @@ Page {
           currentTab: total
           anchors.top: buttonRow.bottom
           anchors.topMargin: 20
-          height: parent.height - buttonRow.height
+          height: parent.height - buttonRow.height - anchors.topMargin
           Item {
               id:total
               anchors.centerIn: parent
@@ -60,11 +58,11 @@ Page {
               anchors.bottom: parent.bottom
               anchors.horizontalCenter: parent.horizontalCenter
               height: parent.height
-              width: 450              
+              width: 470
               ListView {
                   id: listView
                   anchors.fill: parent
-                  model: historyModel //appcontroller.history
+                  model: historyModel
                   section.property: "month" //"intMonth"
                   section.criteria: ViewSection.FullString
                   section.delegate: sectionHeading
@@ -74,8 +72,6 @@ Page {
                       anchors.leftMargin: 5
                       anchors.right: parent.right
                       anchors.rightMargin: 5
-                      //color: "lightyellow"
-                      //border.width: 1
                       Row {
                           spacing: 0
                           anchors.verticalCenter: parent.verticalCenter
@@ -83,7 +79,7 @@ Page {
                           Rectangle {
                               height: 70
                               width: 70
-                              color: "lightyellow"
+                              color: "darkgrey" // appcontroller.inverted ? "darkgrey" : "lightyellow"
                               border.width: 1
                               Label {
                                   id: dayLabel
@@ -95,8 +91,8 @@ Page {
                           }
                           Rectangle {
                               height: 70
-                              width: 360
-                              color: "lightyellow"
+                              width: 380
+                              color: (appcontroller.inverted ? "dark" : "light") + "yellow"
                               border.width: 1
                               Row {
                                   spacing: 8
@@ -147,12 +143,10 @@ Page {
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.rightMargin: 10
-            //anchors.bottomMargin: 5
-            //width: parent.width
             border.width: 1
             radius: 5
             height: 30
-            color: "lightsteelblue"
+            color: (appcontroller.inverted ? "dark" : "light") + "steelblue"
             Label {
                 anchors.centerIn: parent
                 text: section

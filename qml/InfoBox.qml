@@ -10,7 +10,16 @@ Item {
     height: 100
 
     Rectangle {
-        opacity: 0.8
+        id: shadow
+        anchors.centerIn: parent
+        width: parent.width + 4
+        height: parent.height + 4
+        opacity: 0.3
+        color: "lightyellow"
+    }
+
+    Rectangle {
+        //opacity: 0.8
         width: parent.width
         height: parent.height * 0.6
         //anchors.bottomMargin: parent.border.width/2
@@ -52,7 +61,7 @@ Item {
             }
             GradientStop {
                 position: 0.50
-                color: "#333333" //"#c4f1c9"
+                color: "#555555" //"#c4f1c9"
             }
             GradientStop {
                 position: 1.00

@@ -38,7 +38,8 @@ OTHER_FILES += \
     qtc_packaging/debian_harmattan/changelog \
     qml/History.qml \
     qml/InfoBox.qml \
-    qml/Preferences.qml
+    qml/Preferences.qml \
+    human-white.png
 
 RESOURCES += \
     res.qrc
@@ -55,13 +56,16 @@ QMAKE_LFLAGS += -pie -rdynamic
 HEADERS += \
     appcontroller.h \
     historyentry.h \
-    stephandler.h
+    stephandler.h \
+    historymodel.h
 
 contains(MEEGO_EDITION,harmattan) {
     icon.files = pedometer.png
     icon.path = /usr/share/icons/hicolor/80x80/apps
     INSTALLS += icon
 }
+
+
 
 
 

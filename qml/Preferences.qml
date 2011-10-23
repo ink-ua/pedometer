@@ -18,7 +18,7 @@ Page {
 
     Column {
         spacing: 30
-        anchors.margins: 30
+        anchors.margins: 10
         anchors.top: parent.top
         anchors.left: parent.left
         Column {
@@ -88,6 +88,22 @@ Page {
                 width: 300
                 onValueChanged: appcontroller.sensitivity = value
                 //anchors.verticalCenter: lblSense.verticalCenter
+            }
+        }
+        Row {
+            spacing: 10
+            Label {
+                id: lblInv
+                text: "Dark theme"
+                platformStyle: prefLabel
+            }
+            Switch {
+                checked: appcontroller.inverted
+                onCheckedChanged: {
+                    appcontroller.inverted = checked;
+                    theme.inverted = checked;
+                }
+                anchors.verticalCenter: lblInv.verticalCenter
             }
         }
     }

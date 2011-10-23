@@ -12,7 +12,7 @@ class HistoryEntry : public QObject
     Q_PROPERTY(int steps READ getSteps NOTIFY stepsChanged)
     Q_PROPERTY(int day READ getDay NOTIFY dateChanged)
     Q_PROPERTY(QString month READ getMonth NOTIFY dateChanged)
-    Q_PROPERTY(int intMonth READ getIntMonth NOTIFY dateChanged)
+    //Q_PROPERTY(int intMonth READ getIntMonth NOTIFY dateChanged)
 
 public:
     HistoryEntry(QObject *parent=0) : QObject(parent) {}
@@ -31,13 +31,13 @@ public:
         return ret;
     }
 
-    // hash based on Date
-    int hash() {
-        return hash(m_date);
-    }
-    static int hash(QDate d) {
-        return d.dayOfYear() + ((int)(d.year() - 2011) * 365.25);
-    }
+//    // hash based on Date
+//    int hash() {
+//        return hash(m_date);
+//    }
+//    static int hash(QDate d) {
+//        return d.dayOfYear() + ((int)(d.year() - 2011) * 365.25);
+//    }
 
     QDate getDate() const {
         return m_date;
@@ -67,9 +67,9 @@ public:
         return m_date.toString("MMM yyyy");
     }
 
-    int getIntMonth() {
-        return m_date.month() + m_date.year() * 12;
-    }
+//    int getIntMonth() {
+//        return m_date.month() + m_date.year() * 12;
+//    }
 
 signals:
     void timeChanged();

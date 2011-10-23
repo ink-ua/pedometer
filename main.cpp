@@ -49,9 +49,9 @@ int main(int argc, char *argv[])
     view.connect(view.engine(), SIGNAL(quit()), SLOT(close()));
     view.rootContext()->setContextProperty("appcontroller", appController);
 
-    QList<QObject*> history = appController->historyList.values();
-    qSort(history.begin(), history.end(), historyLessThan);
-    view.rootContext()->setContextProperty("historyModel", QVariant::fromValue(history));
+    //QList<QObject*> history = appController->historyList.values();
+   // qSort(history.begin(), history.end(), historyLessThan);
+    view.rootContext()->setContextProperty("historyModel", (QObject*)&(appController->history));
 
     view.setSource(QUrl("qrc:/qml/main.qml"));
     view.showFullScreen();

@@ -6,5 +6,6 @@
         <file>qml/InfoBox.qml</file>
         <file>qml/Preferences.qml</file>
         <file>human.png</file>
+        <file>human-white.png</file>
     </qresource>
 </RCC>
