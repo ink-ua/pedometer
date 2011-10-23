@@ -36,10 +36,10 @@ public:
         return hash(m_date);
     }
     static int hash(QDate d) {
-        return d.dayOfYear() + ((int)(d.year() - 2000) * 365.25);
+        return d.dayOfYear() + ((int)(d.year() - 2011) * 365.25);
     }
 
-    QDate getDate() {
+    QDate getDate() const {
         return m_date;
     }
 

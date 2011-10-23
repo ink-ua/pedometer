@@ -15,6 +15,11 @@
 
 AppController* appController;
 
+// we want descending order
+bool historyLessThan(const QObject* h1, const QObject* h2) {
+     return ((const HistoryEntry*)h1)->getDate() > ((const HistoryEntry*)h2)->getDate();
+}
+
 int main(int argc, char *argv[])
 {
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
@@ -38,13 +43,16 @@ int main(int argc, char *argv[])
     StepHandler filter;
     sensor.addFilter(&filter);
     QObject::connect(&filter, SIGNAL(onStep()), appController, SLOT(incStep()));
-    //QObject::connect(appController, SIGNAL(sensitivityChanged()), &filter, SLOT(updateSensitivity()));
 
     QApplication app(argc, argv);
     QDeclarativeView view;
     view.connect(view.engine(), SIGNAL(quit()), SLOT(close()));
     view.rootContext()->setContextProperty("appcontroller", appController);
-    view.rootContext()->setContextProperty("historyModel", QVariant::fromValue(appController->historyList.values()));
+
+    QList<QObject*> history = appController->historyList.values();
+    qSort(history.begin(), history.end(), historyLessThan);
+    view.rootContext()->setContextProperty("historyModel", QVariant::fromValue(history));
+
     view.setSource(QUrl("qrc:/qml/main.qml"));
     view.showFullScreen();
     sensor.start();

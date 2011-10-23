@@ -54,7 +54,7 @@ public:
         m_todaySteps = queryTodaySteps.next() ? queryTodaySteps.value(0).toInt() : 0;
 
         QString date;
-        QSqlQuery q = m_db.exec("SELECT sum(seconds), sum(steps), date FROM history GROUP BY date ORDER BY date DESC");
+        QSqlQuery q = m_db.exec("SELECT SUM(seconds), SUM(steps), date FROM history GROUP BY date"); // ORDER BY date DESC
         while(q.next()) {
             int t = q.value(0).toInt();
             int s = q.value(1).toInt();
