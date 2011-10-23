@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
     QDeclarativeView view;
     view.connect(view.engine(), SIGNAL(quit()), SLOT(close()));
     view.rootContext()->setContextProperty("appcontroller", appController);
-    view.rootContext()->setContextProperty("historyModel", QVariant::fromValue(appController->historyList));
+    view.rootContext()->setContextProperty("historyModel", QVariant::fromValue(appController->historyList.values()));
     view.setSource(QUrl("qrc:/qml/main.qml"));
     view.showFullScreen();
     sensor.start();

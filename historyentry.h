@@ -31,6 +31,14 @@ public:
         return ret;
     }
 
+    // hash based on Date
+    int hash() {
+        return hash(m_date);
+    }
+    static int hash(QDate d) {
+        return d.dayOfYear() + ((int)(d.year() - 2000) * 365.25);
+    }
+
     QDate getDate() {
         return m_date;
     }

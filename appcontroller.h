@@ -62,7 +62,8 @@ public:
             m_totalTime += t;
             m_totalSteps += s;
             qDebug() << t << s << date;
-            historyList.append(new HistoryEntry(t, s, date));
+            HistoryEntry* h = new HistoryEntry(t, s, date);
+            historyList.insert(h->hash(), h);
         }
         totalStepsChanged();
         totalTimeChanged();
@@ -186,15 +187,14 @@ public:
             q.exec();
 
             QDate currentDate = QDate::currentDate();
-            bool found = false;
-            for(int i = 0; i < historyList.length(); i++)
-                if(((HistoryEntry*)historyList.at(i))->getDate() == currentDate) {
-                    ((HistoryEntry*)historyList.at(i))->plusTime(m_seconds);
-                    ((HistoryEntry*)historyList.at(i))->plusSteps(m_steps);
-                    found = true;
-                }
-            if(!found)
-                historyList.append(new HistoryEntry(m_seconds, m_steps, currentDate));
+            int hash = HistoryEntry::hash(currentDate);
+            if(historyList.contains(hash))  {
+                HistoryEntry* h = (HistoryEntry*)historyList.value(hash);
+                h->plusTime(m_seconds);
+                h->plusSteps(m_steps);
+            }
+            else
+                historyList.insert(hash, new HistoryEntry(m_seconds, m_steps, currentDate));
 
             m_totalSteps += m_steps;
             m_todaySteps += m_steps;
@@ -248,7 +248,7 @@ public:
 //        return historyList;
 //    }
 
-    QList<QObject*> historyList;
+    QHash<int, QObject*> historyList;
 
 public slots:
     void incStep() {
@@ -256,7 +256,6 @@ public slots:
     }
     void onClose() {
         save();
-        delete this;
     }
 
 private:

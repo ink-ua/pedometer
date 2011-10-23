@@ -1,5 +1,6 @@
 import QtQuick 1.0
 import com.nokia.meego 1.0
+//import com.nokia.extras 1.1
 
 Page {
     id: histPage
@@ -59,7 +60,7 @@ Page {
               anchors.bottom: parent.bottom
               anchors.horizontalCenter: parent.horizontalCenter
               height: parent.height
-              width: 450
+              width: 450              
               ListView {
                   id: listView
                   anchors.fill: parent
@@ -128,29 +129,14 @@ Page {
                                   }
                               }
                           }
-//                          Column {
-//                              Label {
-//                                  text: "Steps"
-//                                  font.bold: true
-//                              }
-//                              Label {
-//                                  text: steps
-//                              }
-//                          }
-//                          Column {
-//                              Label {
-//                                  text: "Time"
-//                                  font.bold: true
-//                              }
-//                              Label {
-//                                  text: time
-//                              }
-//                          }
                       }
                   }
               }
               SectionScroller {
                   listView: listView
+              }
+              ScrollDecorator {
+                  flickableItem: listView
               }
           }
     }
