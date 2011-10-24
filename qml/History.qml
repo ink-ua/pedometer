@@ -90,7 +90,7 @@ Page {
                           Rectangle {
                               height: 70
                               width: 70
-                              color: "darkgrey" // appcontroller.inverted ? "darkgrey" : "lightyellow"
+                              color: appcontroller.inverted ? "#666650" : "lightyellow"
                               border.width: 1
                               Label {
                                   id: dayLabel
@@ -103,7 +103,7 @@ Page {
                           Rectangle {
                               height: 70
                               width: 380
-                              color: (appcontroller.inverted ? "#e0a80d" : "lightyellow")
+                              color: (appcontroller.inverted ? "#222222" : "#dddddd")
                               border.width: 1
                               Row {
                                   spacing: 8
@@ -119,7 +119,7 @@ Page {
                                   Label {
                                       text: "steps for"
                                       font.pixelSize: 28
-                                      style: LabelStyle { textColor: appcontroller.inverted ? "lightgrey" : "#555555" }
+                                      style: LabelStyle { textColor: appcontroller.inverted ? "lightgrey" : "#222222" }
                                   }
                                   Label {
                                       text: time
@@ -279,7 +279,7 @@ Page {
             border.width: 1
             radius: 5
             height: 30
-            color: (appcontroller.inverted ? "#234b91" : "lightsteelblue")
+            color: (appcontroller.inverted ? "#225511" : "#77bb66")
             Label {
                 anchors.centerIn: parent
                 text: section
