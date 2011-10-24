@@ -48,10 +48,10 @@ int main(int argc, char *argv[])
     QDeclarativeView view;
     view.connect(view.engine(), SIGNAL(quit()), SLOT(close()));
     view.rootContext()->setContextProperty("appcontroller", appController);
-
-    //QList<QObject*> history = appController->historyList.values();
-   // qSort(history.begin(), history.end(), historyLessThan);
     view.rootContext()->setContextProperty("historyModel", (QObject*)&(appController->history));
+
+//    Object* notif = view.rootObject()->findChild<QObject *>("goalReachedNotification");
+//    appController->setGoalReachedNotificationObject(notif);
 
     view.setSource(QUrl("qrc:/qml/main.qml"));
     view.showFullScreen();

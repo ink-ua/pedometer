@@ -9,6 +9,7 @@ class HistoryEntry : public QObject
     Q_OBJECT
 
     Q_PROPERTY(QString time READ getTime NOTIFY timeChanged)
+    Q_PROPERTY(int seconds READ getSeconds NOTIFY timeChanged)
     Q_PROPERTY(int steps READ getSteps NOTIFY stepsChanged)
     Q_PROPERTY(int day READ getDay NOTIFY dateChanged)
     Q_PROPERTY(QString month READ getMonth NOTIFY dateChanged)
@@ -45,6 +46,10 @@ public:
 
     QString getTime() const {
         return formatTime(m_time);
+    }
+
+    int getSeconds() {
+        return m_time;
     }
 
     void plusTime(int s) {

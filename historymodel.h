@@ -11,7 +11,7 @@ class HistoryModel : public QAbstractListModel
     Q_PROPERTY(int count READ rowCount)
 
 public:
-    enum HISTORY_ROLES { STEPS = Qt::UserRole + 1, TIME, DAY, MONTH };
+    enum HISTORY_ROLES { STEPS = Qt::UserRole + 1, TIME, DAY, MONTH, SECONDS };
 
     HistoryModel(QObject *parent =0) : QAbstractListModel(parent) {
         QHash<int, QByteArray> roles;
@@ -19,6 +19,7 @@ public:
         roles[TIME] = "time";
         roles[DAY] = "day";
         roles[MONTH] = "month";
+        roles[SECONDS] = "seconds";
         setRoleNames(roles);
     }
 
@@ -31,7 +32,7 @@ public:
     }
 
     QVariant data(const QModelIndex & index, int role = Qt::DisplayRole ) const {
-        QVariant v = QVariant();
+        QVariant v = QVariant(QVariant::Invalid);
         if (index.isValid() && index.row() < historyList.count() /*&& role == Qt::DisplayRole*/) {
             HistoryEntry* h = (HistoryEntry*)historyList.at(index.row());
             switch(role) {
@@ -46,6 +47,9 @@ public:
                 break;
             case MONTH:
                 v = QVariant::fromValue(h->getMonth());
+                break;
+            case SECONDS:
+                v = QVariant::fromValue(h->getSeconds());
                 break;
             }
         }

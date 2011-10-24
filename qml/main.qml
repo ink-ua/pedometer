@@ -32,6 +32,9 @@ PageStackWindow {
             }
         }
     }
+//    {
+//    id: goalReachedNotification
+//    }
     Component.onCompleted: {
         theme.inverted = appcontroller.inverted
     }

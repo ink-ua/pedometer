@@ -12,6 +12,8 @@
 #include <QSettings>
 #include <QDate>
 #include <math.h>
+#include <QDeclarativeEngine>
+#include <QDeclarativeComponent>
 
 #include "historyentry.h"
 #include "historymodel.h"
@@ -40,6 +42,7 @@ class AppController : public QObject
     Q_PROPERTY(double calTotal READ getCalTotal NOTIFY calTotalChanged)
     Q_PROPERTY(double sensitivity READ getSensitivity WRITE setSensitivity NOTIFY sensitivityChanged)
     Q_PROPERTY(bool inverted READ getInverted WRITE setInverted NOTIFY invertedChanged)
+    Q_PROPERTY(double calPerStep READ getCalPerStep NOTIFY calPerStepChanged)
 
 public:
     AppController(QSqlDatabase db, QAccelerometer* s) :
@@ -74,6 +77,10 @@ public:
     ~AppController(){
         m_db.close();
         QSqlDatabase::removeDatabase(m_db.connectionName());
+    }
+
+    double getCalPerStep() {
+        return m_calPerStep;
     }
 
     double getTodayDistance() {
@@ -143,6 +150,15 @@ public:
         todayDistanceChanged();
         avgSpeedChanged();
         calChanged();
+
+//        // view notification when daily goal reached
+//        if(m_steps * m_stepLength >= m_daily && (m_steps - 1) * m_stepLength < m_daily) {
+////            QDeclarativeEngine engine;
+////            QDeclarativeComponent component(&engine, QUrl::fromLocalFile("Notification.qml"));
+//            //QObject *object = ;//component.create();
+//            QMetaObject::invokeMethod(m_goalReachedNotification, "open");
+//            //delete object;
+//        }
     }
 
     double getCal() {
@@ -242,6 +258,12 @@ public:
         return ret;
     }
 
+    Q_INVOKABLE QString formatPercent(double v) {
+        QString ret;
+        ret.sprintf("%.2f %", v);
+        return ret;
+    }
+
     double getDistance() const {
         return m_steps * m_stepLength;
     }
@@ -252,9 +274,14 @@ public:
     void setInverted(bool i) {
         if(i != m_inverted) {
             m_inverted = i;
+            settings.setValue("theme_inverted", QVariant(m_inverted));
             emit invertedChanged();
         }
     }
+
+//    void setGoalReachedNotification(QObject* n) {
+//        m_goalReachedNotification = n;
+//    }
 
     HistoryModel history;
 
@@ -282,6 +309,7 @@ private:
     QSettings settings;
     double m_sensitivity;
     bool m_inverted;
+//    QObject* m_goalReachedNotification;
 
 signals:
      void runningChanged();
@@ -299,5 +327,6 @@ signals:
      void calTotalChanged();
      void sensitivityChanged();
      void invertedChanged();
+     void calPerStepChanged();
 };
 #endif // APPCONTROLLER_H

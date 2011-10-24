@@ -1,9 +1,19 @@
-import QtQuick 1.0
+import QtQuick 1.1
 import com.nokia.meego 1.0
 
 Page {
     id: histPage
     orientationLock: PageOrientation.LockPortrait
+
+    function calcRateColor(steps) {
+        var green = parseInt((steps * appcontroller.stepLength) / (appcontroller.daily / 0xFF));
+        var red = 0;
+        if(green > 0xFF)
+            green = 0xFF;
+        else
+            red = 0xFF - green;
+        return "#" + (red <= 0xF ? "0" : "") + red.toString(16) + (green <= 0xF ? "0" : "") + green.toString(16) + "00";
+    }
 
     TabGroup {
           id: tabGroup
@@ -63,10 +73,11 @@ Page {
                   id: listView
                   anchors.fill: parent
                   model: historyModel
-                  section.property: "month" //"intMonth"
+                  section.property: "month"
                   section.criteria: ViewSection.FullString
                   section.delegate: sectionHeading
                   delegate: Item {
+                      property string rateColor: calcRateColor(steps)
                       height: 70
                       anchors.left: parent.left
                       anchors.leftMargin: 5
@@ -92,7 +103,7 @@ Page {
                           Rectangle {
                               height: 70
                               width: 380
-                              color: (appcontroller.inverted ? "dark" : "light") + "yellow"
+                              color: (appcontroller.inverted ? "#e0a80d" : "lightyellow")
                               border.width: 1
                               Row {
                                   spacing: 8
@@ -102,21 +113,13 @@ Page {
                                       font.pixelSize: 30
                                       font.bold: true
                                       style: LabelStyle {
-                                          textColor: {
-                                            var green = parseInt((steps * appcontroller.stepLength) / (appcontroller.daily / 0xFF));
-                                            var red = 0;
-                                            if(green > 0xFF)
-                                                green = 0xFF;
-                                            else
-                                                red = 0xFF - green;
-                                            return "#" + (red <= 0xF ? "0" : "") + red.toString(16) + (green <= 0xF ? "0" : "") + green.toString(16) + "00";
-                                          }
+                                        textColor: rateColor
                                       }
                                   }
                                   Label {
                                       text: "steps for"
                                       font.pixelSize: 28
-                                      style: LabelStyle { textColor: "#555555" }
+                                      style: LabelStyle { textColor: appcontroller.inverted ? "lightgrey" : "#555555" }
                                   }
                                   Label {
                                       text: time
@@ -125,6 +128,136 @@ Page {
                                   }
                               }
                           }
+                      }
+                      MouseArea {
+                        anchors.fill: parent
+                        onClicked: detail.open();
+                      }
+                      Dialog {
+                        id: detail
+                        anchors.fill: parent
+                        anchors.margins: 10
+                        property int fontSize: 40
+                        property string lColor: "lightyellow" // appcontroller.inverted ? "white" : "lightyellow"
+                        title: Label {
+                            text: day + " " + month
+                            font.pixelSize: 60
+                            font.bold: true
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            style: LabelStyle {
+                                textColor: "yellow" //appcontroller.inverted ? "lightyellow" : "yellow"
+                            }
+                        }
+                        content: Grid {
+                            spacing: 25
+                            columns: 2
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            Label {
+                                text: "Steps"
+                                font.pixelSize: detail.fontSize
+                                style: LabelStyle {
+                                    textColor: detail.lColor
+                                }
+                            }
+                            Label {
+                                text: steps
+                                font.pixelSize: detail.fontSize
+                                font.bold: true
+                                style: LabelStyle {
+                                    textColor: detail.lColor
+                                }
+                            }
+                            Label {
+                                text: "Time"
+                                font.pixelSize: detail.fontSize
+                                style: LabelStyle {
+                                    textColor: detail.lColor
+                                }
+                            }
+                            Label {
+                                text: time
+                                font.pixelSize: detail.fontSize
+                                font.bold: true
+                                style: LabelStyle {
+                                    textColor: detail.lColor
+                                }
+                            }
+                            Label {
+                                text: "Distance"
+                                font.pixelSize: detail.fontSize
+                                style: LabelStyle {
+                                    textColor: detail.lColor
+                                }
+                            }
+                            Label {
+                                text: appcontroller.formatDistance(steps * appcontroller.stepLength)
+                                font.pixelSize: detail.fontSize
+                                font.bold: true
+                                style: LabelStyle {
+                                    textColor: detail.lColor
+                                }
+                            }
+                            Label {
+                                text: "Avg speed"
+                                font.pixelSize: detail.fontSize
+                                style: LabelStyle {
+                                    textColor: detail.lColor
+                                }
+                            }
+                            Label {
+                                text: appcontroller.formatDistance((steps * appcontroller.stepLength * 3600) / seconds) + "/h"
+                                font.pixelSize: detail.fontSize
+                                font.bold: true
+                                style: LabelStyle {
+                                    textColor: detail.lColor
+                                }
+                            }
+                            Label {
+                                text: "Calories"
+                                font.pixelSize: detail.fontSize
+                                style: LabelStyle {
+                                    textColor: detail.lColor
+                                }
+                            }
+                            Label {
+                                text: steps * appcontroller.calPerStep
+                                font.pixelSize: detail.fontSize
+                                font.bold: true
+                                style: LabelStyle {
+                                    textColor: detail.lColor
+                                }
+                            }
+                            Label {
+                                text: "Rate"
+                                font.pixelSize: detail.fontSize
+                                style: LabelStyle {
+                                    textColor: detail.lColor
+                                }
+                            }
+                            Label {
+                                id: rate
+                                text: appcontroller.formatPercent(steps * appcontroller.stepLength / (appcontroller.daily / 100.0))
+                                font.pixelSize: detail.fontSize
+                                font.bold: true
+                                style: LabelStyle {
+                                    textColor: rateColor
+                                }
+//                                LabelStyle {
+//                                    textColor: detail.lColor
+//                                }
+//                                style: LabelStyle {
+//                                    textColor: {
+//                                      var green = parseInt(rate.text / (100.0 / 0xFF));
+//                                      var red = 0;
+//                                      if(green > 0xFF)
+//                                          green = 0xFF;
+//                                      else
+//                                          red = 0xFF - green;
+//                                      return "#" + (red <= 0xF ? "0" : "") + red.toString(16) + (green <= 0xF ? "0" : "") + green.toString(16) + "00";
+//                                    }
+//                                }
+                            }
+                        }
                       }
                   }
               }
@@ -146,7 +279,7 @@ Page {
             border.width: 1
             radius: 5
             height: 30
-            color: (appcontroller.inverted ? "dark" : "light") + "steelblue"
+            color: (appcontroller.inverted ? "#234b91" : "lightsteelblue")
             Label {
                 anchors.centerIn: parent
                 text: section

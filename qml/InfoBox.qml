@@ -1,4 +1,4 @@
-import QtQuick 1.0
+import QtQuick 1.1
 import com.nokia.meego 1.0
 
 Item {
@@ -15,7 +15,7 @@ Item {
         width: parent.width + 4
         height: parent.height + 4
         opacity: 0.3
-        color: "lightyellow"
+        color: "yellow"
     }
 
     Rectangle {
