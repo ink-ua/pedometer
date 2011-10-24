@@ -5,11 +5,16 @@ Page {
     id: prefPage
     orientationLock: PageOrientation.LockPortrait
 
-//    Label {
-//        id: title
-//        anchors.top: parent.top
-//        text: "<hr>Preferenses"
-//    }
+    Label {
+        id: title
+        anchors.top: parent.top
+        anchors.topMargin: 10
+        width: parent.width
+        text: "Preferenses<hr>"
+        style: LabelStyle {
+            fontPixelSize: 50
+        }
+    }
 
     LabelStyle {
         id: prefLabel
@@ -17,19 +22,36 @@ Page {
     }
 
     Column {
-        spacing: 30
+        spacing: 40
         anchors.margins: 10
-        anchors.top: parent.top
-        anchors.left: parent.left
+        anchors.top: title.bottom
+        anchors.horizontalCenter: parent.horizontalCenter
         Column {
             spacing: 10
             Label {
+                text: "Units"
+                platformStyle: prefLabel
+            }
+            ButtonRow {
+                Button {
+                    text: "Metric"
+                }
+                Button {
+                    text: "Fucking"
+                }
+            }
+        }
+        Grid {
+            columns: 2
+            spacing: 30
+            Label {
                 id:lblStep
-                text: "Step length (m)"
+                text: "Step length"
                 platformStyle: prefLabel
             }
             TextField {
                 id: stepLength
+                width: 150
                 onTextChanged: appcontroller.stepLength = stepLength.text
                 inputMethodHints: Qt.ImhDigitsOnly
                 validator: DoubleValidator {
@@ -37,18 +59,20 @@ Page {
                     top: 2
                 }
                 text: appcontroller.stepLength
-                //anchors.verticalCenter: lblStep.verticalCenter
+                anchors.verticalCenter: lblStep.verticalCenter
             }
         }
-        Column {
-            spacing: 10
+        Grid {
+            columns: 2
+            spacing: 30
             Label {
                 id:lblDaily
-                text: "Daily distance (km)"
+                text: "Daily distance"
                 platformStyle: prefLabel
             }
             TextField {
                 id: daily
+                width: 150
                 text: appcontroller.daily / 1000.0
                 inputMethodHints: Qt.ImhDigitsOnly
                 validator: DoubleValidator {
@@ -56,7 +80,7 @@ Page {
                     top: 1000
                 }
                 onTextChanged: appcontroller.daily = daily.text * 1000.0
-                //anchors.verticalCenter: lblDaily.verticalCenter
+                anchors.verticalCenter: lblDaily.verticalCenter
             }
         }
         //            Row {
@@ -84,14 +108,15 @@ Page {
                 valueIndicatorVisible: true
                 minimumValue: 0.0
                 maximumValue: 1.0
-                value: appcontroller.sensitivity                
-                width: 300
+                value: appcontroller.sensitivity
+                width: 450
                 onValueChanged: appcontroller.sensitivity = value
                 //anchors.verticalCenter: lblSense.verticalCenter
             }
         }
-        Row {
-            spacing: 10
+        Grid {
+            columns: 2
+            spacing: 30
             Label {
                 id: lblInv
                 text: "Dark theme"
