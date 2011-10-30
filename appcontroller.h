@@ -66,9 +66,10 @@ public:
             date = q.value(2).toString();
             m_totalTime += t;
             m_totalSteps += s;
-            //qDebug() << t << s << date;
+            qDebug() << t << s << date;
             HistoryEntry* h = new HistoryEntry(t, s, date);
-            history.insert(h);
+            //history.getList()->push_front(h);
+            history.push_front(h);//insertRow(0, h);
         }
         totalStepsChanged();
         totalTimeChanged();
@@ -213,7 +214,7 @@ public:
                 first->plusTime(m_seconds);
             }
             else
-                history.insert(new HistoryEntry(m_seconds, m_steps, currentDate));
+                history.insertRow(0, new HistoryEntry(m_seconds, m_steps, currentDate));
 
             m_totalSteps += m_steps;
             m_todaySteps += m_steps;

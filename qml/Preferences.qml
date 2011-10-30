@@ -12,7 +12,7 @@ Page {
         width: parent.width
         text: "Preferenses<hr>"
         style: LabelStyle {
-            fontPixelSize: 50
+            fontPixelSize: 40
         }
     }
 
@@ -37,7 +37,7 @@ Page {
                     text: "Metric"
                 }
                 Button {
-                    text: "Fucking"
+                    text: "No alternatives"
                 }
             }
         }

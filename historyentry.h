@@ -54,10 +54,12 @@ public:
 
     void plusTime(int s) {
         m_time += s;
+        emit dataChanged();
     }
 
     void plusSteps(int s) {
         m_steps += s;
+        emit dataChanged();
     }
 
     int getSteps() {
@@ -80,6 +82,7 @@ signals:
     void timeChanged();
     void stepsChanged();
     void dateChanged();
+    void dataChanged();
 
 private:
     int m_time;

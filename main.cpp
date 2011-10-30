@@ -6,6 +6,7 @@
 #include <QtSql/QSqlQuery>
 #include <QAccelerometer>
 #include <QDesktopServices>
+//#include <qmdisplaystate.h>
 
 #include "stephandler.h"
 #include "appcontroller.h"
@@ -16,9 +17,9 @@
 AppController* appController;
 
 // we want descending order
-bool historyLessThan(const QObject* h1, const QObject* h2) {
-     return ((const HistoryEntry*)h1)->getDate() > ((const HistoryEntry*)h2)->getDate();
-}
+//bool historyLessThan(const QObject* h1, const QObject* h2) {
+//     return ((const HistoryEntry*)h1)->getDate() > ((const HistoryEntry*)h2)->getDate();
+//}
 
 int main(int argc, char *argv[])
 {
@@ -39,6 +40,7 @@ int main(int argc, char *argv[])
 
     QAccelerometer sensor;
     sensor.setDataRate(10);
+    sensor.setProperty("alwaysOn", true);
     appController = new AppController(db, &sensor);
     StepHandler filter;
     sensor.addFilter(&filter);
@@ -48,7 +50,8 @@ int main(int argc, char *argv[])
     QDeclarativeView view;
     view.connect(view.engine(), SIGNAL(quit()), SLOT(close()));
     view.rootContext()->setContextProperty("appcontroller", appController);
-    view.rootContext()->setContextProperty("historyModel", (QObject*)&(appController->history));
+    //view.rootContext()->setContextProperty("historyModel", (QObject*)&(appController->history));
+    view.rootContext()->setContextProperty("historyModel", QVariant::fromValue(*(appController->history.getList())));
 
 //    Object* notif = view.rootObject()->findChild<QObject *>("goalReachedNotification");
 //    appController->setGoalReachedNotificationObject(notif);
