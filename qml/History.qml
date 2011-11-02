@@ -210,6 +210,7 @@ Page {
                   section.delegate: sectionHeading
 
                   delegate: Item {
+                      id: wrapper
                       property string rateColor: calcRateColor(steps)
                       height: 70
                       anchors.left: parent.left
@@ -262,14 +263,19 @@ Page {
                               }
                           }
                       }
-//                      opacity: {
-//                          //if()
-//                      }
-//                      Behavior on opacity {
-//                        enabled:
-//                      }
+                      states: State {
+                          name: "Current"
+                          PropertyChanges { target: wrapper; opacity: 0.5 }
+                      }
+                      transitions: Transition {
+                          NumberAnimation { properties: "opacity"; duration: 100 }
+                      }
                       MouseArea {
                         anchors.fill: parent
+                        onEntered: wrapper.state = "Current";
+                        onCanceled: wrapper.state = "";
+                        onExited: wrapper.state = "";
+                        onReleased: wrapper.state = "";
                         onClicked: {
                             detail.day = day;
                             detail.month = month;
