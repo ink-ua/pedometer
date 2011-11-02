@@ -33,20 +33,20 @@ class AppController : public QObject
     Q_PROPERTY(int seconds READ getSeconds WRITE setSeconds)
     Q_PROPERTY(QString time READ getTime NOTIFY timeChanged)
     Q_PROPERTY(double distance READ getDistance NOTIFY distanceChanged)
-    Q_PROPERTY(int totalSteps READ getTotalSteps NOTIFY totalStepsChanged)
-    Q_PROPERTY(int totalTime READ getTotalTime NOTIFY totalTimeChanged)
+//    Q_PROPERTY(int totalSteps READ getTotalSteps NOTIFY totalStepsChanged)
+//    Q_PROPERTY(int totalTime READ getTotalTime NOTIFY totalTimeChanged)
     Q_PROPERTY(QString avgSpeed READ getAvgSpeed NOTIFY avgSpeedChanged)
     Q_PROPERTY(QString speed READ getSpeed NOTIFY speedChanged)
     Q_PROPERTY(double todayDistance READ getTodayDistance NOTIFY todayDistanceChanged)
     Q_PROPERTY(double cal READ getCal NOTIFY calChanged)
-    Q_PROPERTY(double calTotal READ getCalTotal NOTIFY calTotalChanged)
+//    Q_PROPERTY(double calTotal READ getCalTotal NOTIFY calTotalChanged)
     Q_PROPERTY(double sensitivity READ getSensitivity WRITE setSensitivity NOTIFY sensitivityChanged)
     Q_PROPERTY(bool inverted READ getInverted WRITE setInverted NOTIFY invertedChanged)
     Q_PROPERTY(double calPerStep READ getCalPerStep NOTIFY calPerStepChanged)
 
 public:
     AppController(QSqlDatabase db, QAccelerometer* s) :
-        m_running(true), m_db(db), m_seconds(0), m_steps(0), m_totalSteps(0), m_totalTime(0),
+        m_running(true), m_db(db), m_seconds(0), m_steps(0), //m_totalSteps(0), m_totalTime(0),
         m_lastSteps(0), sensor(s), settings("ink", "Pedometer") {
 
         m_stepLength = settings.value("step_length", QVariant(0.7)).toDouble();
@@ -58,21 +58,21 @@ public:
         QSqlQuery queryTodaySteps = m_db.exec("SELECT SUM(steps) FROM history WHERE date = (date('now'))");
         m_todaySteps = queryTodaySteps.next() ? queryTodaySteps.value(0).toInt() : 0;
 
-        QString date;
-        QSqlQuery q = m_db.exec("SELECT SUM(seconds), SUM(steps), date FROM history GROUP BY date"); // ORDER BY date DESC
-        while(q.next()) {
-            int t = q.value(0).toInt();
-            int s = q.value(1).toInt();
-            date = q.value(2).toString();
-            m_totalTime += t;
-            m_totalSteps += s;
-            qDebug() << t << s << date;
-            HistoryEntry* h = new HistoryEntry(t, s, date);
-            //history.getList()->push_front(h);
-            history.push_front(h);//insertRow(0, h);
-        }
-        totalStepsChanged();
-        totalTimeChanged();
+//        QString date;
+//        QSqlQuery q = m_db.exec("SELECT SUM(seconds), SUM(steps), date FROM history GROUP BY date"); // ORDER BY date DESC
+//        while(q.next()) {
+//            int t = q.value(0).toInt();
+//            int s = q.value(1).toInt();
+//            date = q.value(2).toString();
+//            m_totalTime += t;
+//            m_totalSteps += s;
+//            //qDebug() << t << s << date;
+//            HistoryEntry* h = new HistoryEntry(t, s, date);
+//            //history.getList()->push_front(h);
+//            history.push_front(h);//insertRow(0, h);
+//        }
+//        totalStepsChanged();
+//        totalTimeChanged();
     }
 
     ~AppController(){
@@ -136,9 +136,9 @@ public:
         }
     }
 
-    int getTotalSteps() {
-        return m_totalSteps;
-    }
+//    int getTotalSteps() {
+//        return m_totalSteps;
+//    }
 
     int getSteps() {
         return m_steps;
@@ -166,9 +166,9 @@ public:
         return m_steps * m_calPerStep;
     }
 
-    double getCalTotal() {
-        return m_totalSteps * m_calPerStep;
-    }
+//    double getCalTotal() {
+//        return m_totalSteps * m_calPerStep;
+//    }
 
     int getSeconds() {
         return m_seconds;
@@ -182,6 +182,16 @@ public:
             m_lastSteps = 0;
         }
     }
+
+//    Q_INVOKABLE void loadHistory() {
+//        QDeclarativeEngine engine;
+//        QDeclarativeComponent component(&engine, QUrl::fromLocalFile("History.qml"));
+//        QObject* model = component.findChild<QObject*>("historyModel");
+//        //QObject *object = component.create();
+//        QMetaObject::invokeMethod(model, "append", (QObject*)new HistoryEntry(60, 10, "2011-10-10"));
+//                    //delete object;
+
+//    }
 
     QString getAvgSpeed() {
         double speed = 0;
@@ -207,21 +217,23 @@ public:
             q.bindValue(":steps", m_steps);
             q.exec();
 
-            QDate currentDate = QDate::currentDate();
-            HistoryEntry* first;
-            if(history.rowCount() > 0 && (first = (HistoryEntry*)history.get(0))->getDate() == currentDate) {
-                first->plusSteps(m_steps);
-                first->plusTime(m_seconds);
-            }
-            else
-                history.insertRow(0, new HistoryEntry(m_seconds, m_steps, currentDate));
+            emit entryAdded();
 
-            m_totalSteps += m_steps;
+//            QDate currentDate = QDate::currentDate();
+//            HistoryEntry* first;
+//            if(history.rowCount() > 0 && (first = (HistoryEntry*)history.get(0))->getDate() == currentDate) {
+//                first->plusSteps(m_steps);
+//                first->plusTime(m_seconds);
+//            }
+//            else
+//                history.insertRow(0, new HistoryEntry(m_seconds, m_steps, currentDate));
+
+            //m_totalSteps += m_steps;
             m_todaySteps += m_steps;
-            m_totalTime += m_seconds;
-            totalStepsChanged();
-            totalTimeChanged();
-            calTotalChanged();
+//            m_totalTime += m_seconds;
+//            totalStepsChanged();
+//            totalTimeChanged();
+//            calTotalChanged();
         }
     }
 
@@ -246,9 +258,9 @@ public:
         return formatTime(m_seconds);
     }
 
-    int getTotalTime() const {
-        return m_totalTime;
-    }
+//    int getTotalTime() const {
+//        return m_totalTime;
+//    }
 
     Q_INVOKABLE QString formatDistance(double distance) {
         QString ret;
@@ -284,7 +296,8 @@ public:
 //        m_goalReachedNotification = n;
 //    }
 
-    HistoryModel history;
+    //HistoryModel history;
+    QSqlDatabase m_db;
 
 public slots:
     void incStep() {
@@ -298,10 +311,9 @@ private:
     bool m_running;
     int m_steps;
     int m_seconds;
-    int m_totalSteps;
-    int m_totalTime;
+//    int m_totalSteps;
+//    int m_totalTime;
     double m_stepLength;
-    QSqlDatabase m_db;
     double m_daily;
     int m_todaySteps;
     double m_calPerStep;
@@ -318,16 +330,17 @@ signals:
      void timeChanged();
      void distanceChanged();
      void stepLengthChanged();
-     void totalStepsChanged();
-     void totalTimeChanged();
+//     void totalStepsChanged();
+//     void totalTimeChanged();
      void avgSpeedChanged();
      void dailyChanged();
      void todayDistanceChanged();
      void calChanged();
      void speedChanged();
-     void calTotalChanged();
+//     void calTotalChanged();
      void sensitivityChanged();
      void invertedChanged();
      void calPerStepChanged();
+     void entryAdded();
 };
 #endif // APPCONTROLLER_H

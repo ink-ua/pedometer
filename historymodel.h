@@ -42,23 +42,7 @@ public:
         if (index.isValid() && index.row() < historyList.count() && index.row() > 0 /*&& role == Qt::DisplayRole*/) {
             HistoryEntry* h = (HistoryEntry*)historyList.at(index.row());
             qDebug() << "row" << index.row() << "data" << h->getSteps() << h->getTime() << h->getMonth();
-            switch(role) {
-            case STEPS:
-                v = QVariant::fromValue(h->getSteps());
-                break;
-            case TIME:
-                v = QVariant::fromValue(h->getTime());
-                break;
-            case DAY:
-                v = QVariant::fromValue(h->getDay());
-                break;
-            case MONTH:
-                v = QVariant::fromValue(h->getMonth());
-                break;
-            case SECONDS:
-                v = QVariant::fromValue(h->getSeconds());
-                break;
-            }
+            v = h->data(role);
         }        
         return v;
     }

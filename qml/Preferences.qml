@@ -26,21 +26,21 @@ Page {
         anchors.margins: 10
         anchors.top: title.bottom
         anchors.horizontalCenter: parent.horizontalCenter
-        Column {
-            spacing: 10
-            Label {
-                text: "Units"
-                platformStyle: prefLabel
-            }
-            ButtonRow {
-                Button {
-                    text: "Metric"
-                }
-                Button {
-                    text: "No alternatives"
-                }
-            }
-        }
+//        Column {
+//            spacing: 10
+//            Label {
+//                text: "Units"
+//                platformStyle: prefLabel
+//            }
+//            ButtonRow {
+//                Button {
+//                    text: "Metric"
+//                }
+//                Button {
+//                    text: "No alternatives"
+//                }
+//            }
+//        }
         Grid {
             columns: 2
             spacing: 30

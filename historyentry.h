@@ -2,6 +2,7 @@
 #define HISTORYENTRY_H
 
 #include <QObject>
+#include <QVariant>
 #include <QDate>
 
 class HistoryEntry : public QObject
@@ -16,6 +17,8 @@ class HistoryEntry : public QObject
     //Q_PROPERTY(int intMonth READ getIntMonth NOTIFY dateChanged)
 
 public:
+    enum HISTORY_ROLES { STEPS = Qt::UserRole + 1, TIME, DAY, MONTH, SECONDS };
+
     HistoryEntry(QObject *parent=0) : QObject(parent) {}
     HistoryEntry(int time, int steps, QString date, QObject *parent=0)
         : QObject(parent), m_time(time), m_steps(steps), m_date(QDate::fromString(date, "yyyy-MM-dd")) {}
@@ -30,6 +33,30 @@ public:
         QString ret;
         ret.sprintf("%.2d:%.2d:%.2d", hr, min, sec);
         return ret;
+    }
+
+    QVariant data(int role) const {
+        QVariant v;
+        switch(role) {
+        case STEPS:
+            v = QVariant::fromValue(getSteps());
+            break;
+        case TIME:
+            v = QVariant::fromValue(getTime());
+            break;
+        case DAY:
+            v = QVariant::fromValue(getDay());
+            break;
+        case MONTH:
+            v = QVariant::fromValue(getMonth());
+            break;
+        case SECONDS:
+            v = QVariant::fromValue(getSeconds());
+            break;
+        default:
+            v = QVariant();
+        }
+        return v;
     }
 
 //    // hash based on Date
@@ -48,7 +75,7 @@ public:
         return formatTime(m_time);
     }
 
-    int getSeconds() {
+    int getSeconds() const {
         return m_time;
     }
 
@@ -62,15 +89,15 @@ public:
         emit dataChanged();
     }
 
-    int getSteps() {
+    int getSteps() const {
         return m_steps;
     }
 
-    int getDay() {
+    int getDay() const {
         return m_date.day();
     }
 
-    QString getMonth() {
+    QString getMonth() const {
         return m_date.toString("MMM yyyy");
     }
 

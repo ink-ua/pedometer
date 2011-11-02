@@ -9,17 +9,14 @@
 //#include <qmdisplaystate.h>
 
 #include "stephandler.h"
+#include "historyprovider.h"
 #include "appcontroller.h"
 
 #define APP_NAME "Pedometer"
 #define SQLITE_V ".sqlite3"
 
-AppController* appController;
 
-// we want descending order
-//bool historyLessThan(const QObject* h1, const QObject* h2) {
-//     return ((const HistoryEntry*)h1)->getDate() > ((const HistoryEntry*)h2)->getDate();
-//}
+AppController* appController;
 
 int main(int argc, char *argv[])
 {
@@ -46,12 +43,16 @@ int main(int argc, char *argv[])
     sensor.addFilter(&filter);
     QObject::connect(&filter, SIGNAL(onStep()), appController, SLOT(incStep()));
 
+    HistoryProvider historyProvider;
+    //QObject::connect(appController, SIGNAL(entryAdded()), &historyProvider, SLOT(entryAdded(int s, int t)));
+
     QApplication app(argc, argv);
     QDeclarativeView view;
     view.connect(view.engine(), SIGNAL(quit()), SLOT(close()));
     view.rootContext()->setContextProperty("appcontroller", appController);
+    view.rootContext()->setContextProperty("historyProvider", &historyProvider);
     //view.rootContext()->setContextProperty("historyModel", (QObject*)&(appController->history));
-    view.rootContext()->setContextProperty("historyModel", QVariant::fromValue(*(appController->history.getList())));
+    //view.rootContext()->setContextProperty("historyModel", QVariant::fromValue(*(appController->history.getList())));
 
 //    Object* notif = view.rootObject()->findChild<QObject *>("goalReachedNotification");
 //    appController->setGoalReachedNotificationObject(notif);

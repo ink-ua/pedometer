@@ -5,6 +5,12 @@ Page {
     id: histPage
     orientationLock: PageOrientation.LockPortrait
 
+    Component.onCompleted: {
+        historyProvider.loadHistory();
+        while(historyProvider.nextEntry())
+            historyModel.append(historyProvider.getNextEntry());
+    }
+
     function calcRateColor(steps) {
         var green = parseInt((steps * appcontroller.stepLength) / (appcontroller.daily / 0xFF));
         var red = 0;
@@ -13,6 +19,10 @@ Page {
         else
             red = 0xFF - green;
         return "#" + (red <= 0xF ? "0" : "") + red.toString(16) + (green <= 0xF ? "0" : "") + green.toString(16) + "00";
+    }
+
+    ListModel {
+        id: historyModel
     }
 
     Dialog {
@@ -154,31 +164,31 @@ Page {
                   InfoBox {
                       id: totalSteps
                       title: "Total steps"
-                      text: appcontroller.totalSteps
+                      text: historyProvider.totalSteps
                       width: parent.width
                   }
                   InfoBox {
                       id: totalTime
                       title: "Total time"
-                      text: appcontroller.formatTime(appcontroller.totalTime)
+                      text: appcontroller.formatTime(historyProvider.totalTime)
                       width: parent.width
                   }
                   InfoBox {
                       id: totalDistance
                       title: "Total distance"
-                      text: appcontroller.formatDistance(appcontroller.totalSteps * appcontroller.stepLength)
+                      text: appcontroller.formatDistance(historyProvider.totalSteps * appcontroller.stepLength)
                       width:parent.width
                   }
                   InfoBox {
                       id: totalCalories
                       title: "Total calories"
-                      text: appcontroller.calTotal
+                      text: historyProvider.calTotal
                       width:parent.width
                   }
                   InfoBox {
                       id: avgSpeed
                       title: "Average speed"
-                      text: appcontroller.formatDistance((appcontroller.totalSteps * appcontroller.stepLength * 3600) / appcontroller.totalTime) + "/h"
+                      text: appcontroller.formatDistance((historyProvider.totalSteps * appcontroller.stepLength * 3600) / historyProvider.totalTime) + "/h"
                       width:parent.width
                   }
               }
@@ -252,6 +262,12 @@ Page {
                               }
                           }
                       }
+//                      opacity: {
+//                          //if()
+//                      }
+//                      Behavior on opacity {
+//                        enabled:
+//                      }
                       MouseArea {
                         anchors.fill: parent
                         onClicked: {
