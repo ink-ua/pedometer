@@ -21,6 +21,8 @@ public:
 
     Q_INVOKABLE void loadHistory() {
         qDebug() << "* they want history";
+        m_totalTime = 0;
+        m_totalSteps = 0;
         q = appController->m_db.exec("SELECT SUM(seconds), SUM(steps), date FROM history GROUP BY date ORDER BY date DESC");
     }
 

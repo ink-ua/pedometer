@@ -201,7 +201,9 @@ public:
     }
 
     QString getSpeed() {
-        double speed = m_lastSteps * m_stepLength * (3600 / LAST_STEPS_TIME);
+        double speed = 0;
+        if(isRunning())
+            speed = m_lastSteps * m_stepLength * (3600 / LAST_STEPS_TIME);
         return formatDistance(speed) + "/h";
     }
 
