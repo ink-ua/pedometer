@@ -11,6 +11,14 @@ Page {
             historyModel.append(historyProvider.getNextEntry());
     }
 
+    Connections {
+        target: historyProvider
+        onEntryAdded: {
+            console.log(h.steps);
+            //historyModel.insert(0, h);
+        }
+    }
+
     function calcRateColor(steps) {
         var green = parseInt((steps * appcontroller.stepLength) / (appcontroller.daily / 0xFF));
         var red = 0;

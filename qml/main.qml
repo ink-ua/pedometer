@@ -22,18 +22,17 @@ PageStackWindow {
                     tab: mainPage
                 }
                 TabButton {
+                    property Page histPage
                     id: histButton
                     iconSource: "image://theme/icon-m-toolbar-history" + (appcontroller.inverted ? "-white" : "")
                     tab: histPage
                     onClicked: {
-                        if(histPage)
-                            histPage.destroy();
-                        var component = Qt.createComponent("History.qml");
-                        if (component.status == Component.Ready) {
-                            var histPage = component.createObject(tabgroup, { id: histPage });
-                            tabgroup.currentTab = histPage;
-                            //histButton.tab = histPage;
+                        if(!histPage) {
+                            var component = Qt.createComponent("History.qml");
+                            if (component.status == Component.Ready)
+                                histPage = component.createObject(tabgroup); // , { id: histPage }
                         }
+                        tabgroup.currentTab = histPage;
                     }
                 }
                 TabButton {                    

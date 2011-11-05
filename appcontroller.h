@@ -6,7 +6,7 @@
 #include <QtSql/QSqlDatabase>
 #include <QtSql/QSqlQuery>
 #include <QVariant>
-#include <QDebug>
+//#include <QDebug>
 #include <QDate>
 #include <QAccelerometer>
 #include <QSettings>
@@ -16,12 +16,12 @@
 #include <QDeclarativeComponent>
 
 #include "historyentry.h"
-#include "historymodel.h"
+//#include "historymodel.h"
 
 QTM_USE_NAMESPACE
 
 #define LAST_STEPS_TIME 10
-#define EPS 0.0001
+#define EPS 0.001
 
 class AppController : public QObject
 {
@@ -53,7 +53,7 @@ public:
         m_daily = settings.value("daily", QVariant(10000)).toDouble();
         m_calPerStep = settings.value("cal_per_step", QVariant(0.03)).toDouble();
         m_sensitivity = settings.value("sensitivity", QVariant(0.75)).toDouble();
-        m_inverted = settings.value("theme_inverted", QVariant(false)).toBool();
+        m_inverted = settings.value("theme_inverted", QVariant(true)).toBool();
 
         QSqlQuery queryTodaySteps = m_db.exec("SELECT SUM(steps) FROM history WHERE date = (date('now'))");
         m_todaySteps = queryTodaySteps.next() ? queryTodaySteps.value(0).toInt() : 0;
@@ -115,7 +115,7 @@ public:
         return m_daily;
     }
     void setDaily(double d) {
-        if(d > 0 && abs(d - m_daily) > EPS) {
+        if(d > 0 && fabs(d - m_daily) > EPS) {
             m_daily = d;
             settings.setValue("daily", QVariant(m_daily));
             dailyChanged();
@@ -213,13 +213,13 @@ public:
 
     Q_INVOKABLE void save() {
         if(m_steps > 0) {
-            QSqlQuery q(m_db);
-            q.prepare("INSERT INTO history(seconds, steps) VALUES(:seconds, :steps)");
-            q.bindValue(":seconds", m_seconds);
-            q.bindValue(":steps", m_steps);
-            q.exec();
+//            QSqlQuery q(m_db);
+//            q.prepare("INSERT INTO history(seconds, steps) VALUES(:seconds, :steps)");
+//            q.bindValue(":seconds", m_seconds);
+//            q.bindValue(":steps", m_steps);
+//            q.exec();
 
-            emit entryAdded();
+            emit entryAdded(m_seconds, m_steps);
 
 //            QDate currentDate = QDate::currentDate();
 //            HistoryEntry* first;
@@ -343,6 +343,6 @@ signals:
      void sensitivityChanged();
      void invertedChanged();
      void calPerStepChanged();
-     void entryAdded();
+     void entryAdded(int t, int s);
 };
 #endif // APPCONTROLLER_H

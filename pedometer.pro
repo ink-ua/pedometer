@@ -57,7 +57,6 @@ HEADERS += \
     appcontroller.h \
     historyentry.h \
     stephandler.h \
-    historymodel.h \
     historyprovider.h
 
 contains(MEEGO_EDITION,harmattan) {
@@ -65,6 +64,7 @@ contains(MEEGO_EDITION,harmattan) {
     icon.path = /usr/share/icons/hicolor/80x80/apps
     INSTALLS += icon
 }
+
 
 
 

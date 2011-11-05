@@ -2,7 +2,7 @@
 #include <QtDeclarative>
 #include <QtSql/QSqlDatabase>
 #include <QtSql/QSqlError>
-#include <QDebug>
+//#include <QDebug>
 #include <QtSql/QSqlQuery>
 #include <QAccelerometer>
 #include <QDesktopServices>
@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
     //qDebug() << baseDataPath;
     db.setDatabaseName(baseDataPath + "/pedometer" + SQLITE_V);
     if(!db.open())
-        qDebug() << "Error opening database:" << db.lastError().number();
+        ;//qDebug() << "Error opening database:" << db.lastError().number();
 
 //    db.exec("DROP TABLE history");
 
@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
     QObject::connect(&filter, SIGNAL(onStep()), appController, SLOT(incStep()));
 
     HistoryProvider historyProvider;
-    //QObject::connect(appController, SIGNAL(entryAdded()), &historyProvider, SLOT(entryAdded(int s, int t)));
+    QObject::connect(appController, SIGNAL(entryAdded(int, int)), &historyProvider, SLOT(addEntry(int, int)));
 
     QApplication app(argc, argv);
     QDeclarativeView view;
