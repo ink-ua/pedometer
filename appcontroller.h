@@ -20,7 +20,7 @@
 
 QTM_USE_NAMESPACE
 
-#define LAST_STEPS_TIME 10
+#define LAST_STEPS_TIME 5
 #define EPS 0.001
 
 class AppController : public QObject
@@ -47,7 +47,10 @@ class AppController : public QObject
 public:
     AppController(QSqlDatabase db, QAccelerometer* s) :
         m_running(true), m_db(db), m_seconds(0), m_steps(0), //m_totalSteps(0), m_totalTime(0),
-        m_lastSteps(0), sensor(s), settings("ink", "Pedometer") {
+        sensor(s), settings("ink", "Pedometer"), m_lastSecond(0) {
+
+        for(int i = 0; i < LAST_STEPS_TIME; i++)
+            m_lastSteps[i] = 0;
 
         m_stepLength = settings.value("step_length", QVariant(0.7)).toDouble();
         m_daily = settings.value("daily", QVariant(10000)).toDouble();
@@ -144,13 +147,16 @@ public:
         return m_steps;
     }
     void setSteps(int s) {
-        m_steps = s;
-        m_lastSteps++;
-        stepsChanged();
-        distanceChanged();
-        todayDistanceChanged();
-        avgSpeedChanged();
-        calChanged();
+        if(m_steps != s) {
+            m_steps = s;
+            m_lastSteps[m_lastSecond]++;
+            stepsChanged();
+            distanceChanged();
+            todayDistanceChanged();
+            avgSpeedChanged();
+            calChanged();
+            m_lastStepTimestamp = QDateTime::currentMSecsSinceEpoch();
+        }
 
 //        // view notification when daily goal reached
 //        if(m_steps * m_stepLength >= m_daily && (m_steps - 1) * m_stepLength < m_daily) {
@@ -174,12 +180,19 @@ public:
         return m_seconds;
     }
     void setSeconds(int s) {
-        m_seconds = s;
-        timeChanged();
-        avgSpeedChanged();
-        if(m_seconds % LAST_STEPS_TIME == 0) {
-            speedChanged();
-            m_lastSteps = 0;
+        if(m_seconds != s && QDateTime::currentMSecsSinceEpoch() - m_lastStepTimestamp < 3000) {
+            m_seconds = s;
+            timeChanged();
+            avgSpeedChanged();
+
+            if(m_lastSecond == LAST_STEPS_TIME - 1) {
+                speedChanged();
+                for(int i = 0; i < LAST_STEPS_TIME - 1; i++)
+                    m_lastSteps[i] = m_lastSteps[i + 1];
+                m_lastSteps[LAST_STEPS_TIME - 1] = 0;
+            } else {
+                m_lastSecond++;
+            }
         }
     }
 
@@ -202,8 +215,14 @@ public:
 
     QString getSpeed() {
         double speed = 0;
+
+        int sum = 0;
+        for(int i = 0; i < LAST_STEPS_TIME; i++)
+            sum += m_lastSteps[i];
+        //qDebug() << sum;
+
         if(isRunning())
-            speed = m_lastSteps * m_stepLength * (3600 / LAST_STEPS_TIME);
+            speed = sum * m_stepLength * (3600 / LAST_STEPS_TIME);
         return formatDistance(speed) + "/h";
     }
 
@@ -319,11 +338,13 @@ private:
     double m_daily;
     int m_todaySteps;
     double m_calPerStep;
-    int m_lastSteps;
+    short m_lastSteps[LAST_STEPS_TIME];
+    short m_lastSecond;
     QAccelerometer *sensor;
     QSettings settings;
     double m_sensitivity;
     bool m_inverted;
+    quint64 m_lastStepTimestamp;
 //    QObject* m_goalReachedNotification;
 
 signals:
