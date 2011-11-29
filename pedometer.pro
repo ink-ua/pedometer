@@ -39,7 +39,8 @@ OTHER_FILES += \
     qml/History.qml \
     qml/InfoBox.qml \
     qml/Preferences.qml \
-    human-white.png
+    human-white.png \
+    splash.png
 
 RESOURCES += \
     res.qrc

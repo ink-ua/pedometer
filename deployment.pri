@@ -95,14 +95,18 @@ symbian {
     }
     icon.files = $${TARGET}.png
     icon.path = /usr/share/icons/hicolor/64x64/apps
+    other_files.files = splash.png
+    other_files.path = /usr/share/applications/$${TARGET}
     desktopfile.files = $${TARGET}.desktop
     target.path = $${installPrefix}/bin
     export(icon.files)
     export(icon.path)
+    export(other_files.files)
+    export(other_files.path)
     export(desktopfile.files)
     export(desktopfile.path)
     export(target.path)
-    INSTALLS += desktopfile icon target
+    INSTALLS += desktopfile icon target other_files
 }
 
 export (ICON)
@@ -113,3 +117,7 @@ export (TARGET.CAPABILITY)
 export (LIBS)
 export (QMAKE_EXTRA_TARGETS)
 }
+
+OTHER_FILES +=
+
+

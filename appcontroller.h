@@ -344,8 +344,6 @@ private:
     bool m_running;
     int m_steps;
     int m_seconds;
-//    int m_totalSteps;
-//    int m_totalTime;
     double m_stepLength;
     double m_daily;
     int m_todaySteps;
@@ -358,7 +356,6 @@ private:
     bool m_inverted;
     quint64 m_lastStepTimestamp;
     bool m_freezeTimer;
-//    QObject* m_goalReachedNotification;
 
 signals:
      void runningChanged();
@@ -366,14 +363,11 @@ signals:
      void timeChanged();
      void distanceChanged();
      void stepLengthChanged();
-//     void totalStepsChanged();
-//     void totalTimeChanged();
      void avgSpeedChanged();
      void dailyChanged();
      void todayDistanceChanged();
      void calChanged();
      void speedChanged();
-//     void calTotalChanged();
      void sensitivityChanged();
      void invertedChanged();
      void calPerStepChanged();
