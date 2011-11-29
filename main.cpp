@@ -8,13 +8,13 @@
 #include <QDesktopServices>
 //#include <qmdisplaystate.h>
 
+#include "rotationfilter.h"
 #include "stephandler.h"
 #include "historyprovider.h"
 #include "appcontroller.h"
 
 #define APP_NAME "Pedometer"
 #define SQLITE_V ".sqlite3"
-
 
 AppController* appController;
 
@@ -31,16 +31,22 @@ int main(int argc, char *argv[])
 //    db.exec("DROP TABLE history");
 
     if(!db.tables().contains("history")) {
-        qDebug("create history");
-        db.exec("CREATE TABLE history(id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, seconds INTEGER NOT NULL, steps INTEGER NOT NULL, date DATE NOT NULL DEFAULT (date('now')))");
+        //qDebug("create history");
+        db.exec("CREATE TABLE history(id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, seconds INTEGER NOT NULL, steps INTEGER NOT NULL, date DATE NOT NULL DEFAULT (date('now'))); CREATE INDEX date_idx ON history(date);");
     }
 
+    // set up sensors
+//    QRotationSensor rotation;
+//    rotation.setDataRate(10);
+//    rotation.setProperty("alwaysOn", true);
     QAccelerometer sensor;
-    sensor.setDataRate(10);
-    sensor.setProperty("alwaysOn", true);
+    sensor.setDataRate(20);
+    sensor.setProperty("alwaysOn", true);    
     appController = new AppController(db, &sensor);
     StepHandler filter;
     sensor.addFilter(&filter);
+//    RotationFilter rfilter;
+//    rotation.addFilter(rfilter);
     QObject::connect(&filter, SIGNAL(onStep()), appController, SLOT(incStep()));
 
     HistoryProvider historyProvider;

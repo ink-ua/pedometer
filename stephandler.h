@@ -1,8 +1,6 @@
 #ifndef STEPSENSOR_H
 #define STEPSENSOR_H
 
-#define MAGNETIC_FIELD_EARTH_MAX 60.0f
-//#define MAGNETIC_FIELD_EARTH_MIN 30.0f
 //#define GRAVITY_EARTH 9.806650161743164f
 
 #include <QAccelerometerFilter>
@@ -11,6 +9,7 @@
 #include <math.h>
 
 #include "appcontroller.h"
+//#include "rotationfilter.h"
 
 QTM_USE_NAMESPACE
 
@@ -22,70 +21,77 @@ class StepHandler : public QObject, public QAccelerometerFilter {
 private:
     float mYOffset;
     float mScale;
-    float mLastValues[3*2];
-    float mLastDirections[3*2];
-    float mLowerLimit, mUpperLimit;
-    float mLastDiff[3*2];
+    float mLastValue;
+    short mLastDirection;
+    float mLowerLimit;//, mUpperLimit;
+    float mLastDiff;
     int mLastMatch;
-    float mLastExtremes[3*2][3*2];
+    float mLastExtremes[2];
+//    RotationFilter mRotationFilter;
+//    quint64 mTime;
+    quint64 mExtremeTime[2];
 
 public:
-    StepHandler() {
-        int h = 480; // TODO: remove this constant
-        mYOffset = h * 0.5f;
-        //updateSensitivity();
-        mScale = -(h * 0.5f * (2.0f / MAGNETIC_FIELD_EARTH_MAX));
+    StepHandler(/*RotationFilter& rf*/) {
+        mYOffset = 240;
+        mScale = -8;
         mLowerLimit = 5;
-        mUpperLimit = 70;
+        //mUpperLimit = 500;
         mLastMatch = -1;
+        //mRotationFilter = rf;
+
+        mLastValue = 0;
     }
 
     bool filter(QAccelerometerReading *reading) {
         qreal values[3] = { reading->x(), reading->y(), reading->z() };
 
+        quint64 time = QDateTime::currentMSecsSinceEpoch();
+
         qreal vSum = 0;
         for(int i = 0; i < 3; i++)
-            vSum += (mYOffset + values[i] * mScale) * appController->getSensitivity();
-        //qDebug() << vSum;
-        int k = 0;
-        float v = vSum / 3;
+            vSum += mYOffset + values[i] * mScale;
+        float v = vSum * (0.5 + appController->getSensitivity());
 
-        float direction = (v > mLastValues[k] ? 1 : (v < mLastValues[k] ? -1 : 0));
-        if (direction == -mLastDirections[k]) {
-            // Direction changed
-            int extType = (direction > 0 ? 0 : 1); // minumum or maximum?
-            mLastExtremes[extType][k] = mLastValues[k];
-            float diff = abs(mLastExtremes[extType][k] - mLastExtremes[1 - extType][k]);
+        short direction = (v > mLastValue ? 1 : (v < mLastValue ? -1 : 0));
+        if (direction == -mLastDirection) {
+            qDebug() << "direction changed";
+            short extType = (direction > 0 ? 0 : 1); // minumum or maximum?
+            mLastExtremes[extType] = mLastValue;
 
-            if (diff > mLowerLimit && diff < mUpperLimit) {
-               // qDebug() << "Limit passed";
-                bool isAlmostAsLargeAsPrevious = diff > (mLastDiff[k]*2/3);
-                bool isPreviousLargeEnough = mLastDiff[k] > (diff/3);
-                bool isNotContra = (mLastMatch != 1 - extType);
+            float diff = fabs(mLastExtremes[extType] - mLastExtremes[1 - extType]);
 
-                if (isAlmostAsLargeAsPrevious && isPreviousLargeEnough && isNotContra) {
-                    emit onStep();
-                    mLastMatch = extType;
+            if(time - mExtremeTime[extType] > 50 && time - mExtremeTime[1 - extType] > 50) {
+                    quint64 timeDiff = mExtremeTime[1 - extType] - mExtremeTime[extType];
+
+                    qDebug() << (diff > mLowerLimit) /*<< (diff < mUpperLimit)*/ << (timeDiff > 100 / appController->getSensitivity()) << (timeDiff < 1000);
+                    if (diff > mLowerLimit /*&& diff < mUpperLimit*/ && timeDiff > 100 / appController->getSensitivity() && timeDiff < 1000) {
+                        bool isAlmostAsLargeAsPrevious = diff > (mLastDiff * 0.4);
+                        bool isPreviousLargeEnough = mLastDiff > (diff * 0.2);
+                        bool isNotContra = (mLastMatch != 1 - extType);
+
+                        qDebug() << "limit passed" << isAlmostAsLargeAsPrevious << isPreviousLargeEnough << isNotContra;
+                        if (isAlmostAsLargeAsPrevious && isPreviousLargeEnough && isNotContra) {
+                            qDebug() << timeDiff;
+                            emit onStep();
+                            mLastMatch = extType;
+                        }
+                        else
+                            mLastMatch = -1;
+                    }
                 }
-                else {
-                    mLastMatch = -1;
-                }
-            }
-            mLastDiff[k] = diff;
+            if(time - mExtremeTime[extType] > 100)
+                mExtremeTime[extType] = time;
+
+            mLastDiff = diff;
         }
-        mLastDirections[k] = direction;
-        mLastValues[k] = v;
-
+        mLastDirection = direction;
+        mLastValue = v;
         return false;
     }
 
 signals:
     void onStep();
-
-//public slots:
-//    void updateSensitivity() {
-//        mScale = -(mYOffset * (3.0f / (MAGNETIC_FIELD_EARTH_MAX * appController->getSensitivity())));
-//    }
 };
 
 #endif // STEPSENSOR_H

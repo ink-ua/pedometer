@@ -57,13 +57,17 @@ HEADERS += \
     appcontroller.h \
     historyentry.h \
     stephandler.h \
-    historyprovider.h
+    historyprovider.h \
+    rotationfilter.h
 
 contains(MEEGO_EDITION,harmattan) {
     icon.files = pedometer.png
     icon.path = /usr/share/icons/hicolor/80x80/apps
     INSTALLS += icon
 }
+
+
+
 
 
 

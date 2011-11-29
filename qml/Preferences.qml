@@ -131,5 +131,21 @@ Page {
                 anchors.verticalCenter: lblInv.verticalCenter
             }
         }
+        Grid {
+            columns: 2
+            spacing: 30
+            Label {
+                id: lblFreeze
+                text: "Freeze when not walking"
+                platformStyle: prefLabel
+            }
+            Switch {
+                checked: appcontroller.freeze
+                onCheckedChanged: {
+                    appcontroller.freeze = checked;
+                }
+                anchors.verticalCenter: lblFreeze.verticalCenter
+            }
+        }
     }
 }
