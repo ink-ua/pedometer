@@ -20,7 +20,8 @@
 
 QTM_USE_NAMESPACE
 
-#define LAST_STEPS_TIME 5
+#define LAST_STEPS_TIME 10
+#define SPEED_WEIGHT 2.0 / (1 + LAST_STEPS_TIME);
 #define EPS 0.001
 
 class AppController : public QObject
@@ -33,16 +34,14 @@ class AppController : public QObject
     Q_PROPERTY(int seconds READ getSeconds WRITE setSeconds)
     Q_PROPERTY(QString time READ getTime NOTIFY timeChanged)
     Q_PROPERTY(double distance READ getDistance NOTIFY distanceChanged)
-//    Q_PROPERTY(int totalSteps READ getTotalSteps NOTIFY totalStepsChanged)
-//    Q_PROPERTY(int totalTime READ getTotalTime NOTIFY totalTimeChanged)
     Q_PROPERTY(QString avgSpeed READ getAvgSpeed NOTIFY avgSpeedChanged)
     Q_PROPERTY(QString speed READ getSpeed NOTIFY speedChanged)
     Q_PROPERTY(double todayDistance READ getTodayDistance NOTIFY todayDistanceChanged)
     Q_PROPERTY(double cal READ getCal NOTIFY calChanged)
-//    Q_PROPERTY(double calTotal READ getCalTotal NOTIFY calTotalChanged)
     Q_PROPERTY(double sensitivity READ getSensitivity WRITE setSensitivity NOTIFY sensitivityChanged)
     Q_PROPERTY(bool inverted READ getInverted WRITE setInverted NOTIFY invertedChanged)
     Q_PROPERTY(double calPerStep READ getCalPerStep NOTIFY calPerStepChanged)
+    Q_PROPERTY(bool freeze READ getFreeze WRITE setFreeze NOTIFY freezeChanged)
 
 public:
     AppController(QSqlDatabase db, QAccelerometer* s) :
@@ -57,6 +56,7 @@ public:
         m_calPerStep = settings.value("cal_per_step", QVariant(0.03)).toDouble();
         m_sensitivity = settings.value("sensitivity", QVariant(0.75)).toDouble();
         m_inverted = settings.value("theme_inverted", QVariant(true)).toBool();
+        m_freezeTimer = settings.value("freeze_timer", QVariant(true)).toBool();
 
         QSqlQuery queryTodaySteps = m_db.exec("SELECT SUM(steps) FROM history WHERE date = (date('now'))");
         m_todaySteps = queryTodaySteps.next() ? queryTodaySteps.value(0).toInt() : 0;
@@ -180,10 +180,12 @@ public:
         return m_seconds;
     }
     void setSeconds(int s) {
-        if(m_seconds != s && QDateTime::currentMSecsSinceEpoch() - m_lastStepTimestamp < 3000) {
-            m_seconds = s;
-            timeChanged();
-            avgSpeedChanged();
+        if(m_seconds != s) {
+            if(!m_freezeTimer || QDateTime::currentMSecsSinceEpoch() - m_lastStepTimestamp < 2000) {
+                m_seconds = s;
+                timeChanged();
+                avgSpeedChanged();
+            }
 
             if(m_lastSecond == LAST_STEPS_TIME - 1) {
                 speedChanged();
@@ -216,10 +218,9 @@ public:
     QString getSpeed() {
         double speed = 0;
 
-        int sum = 0;
+        double sum = 0;
         for(int i = 0; i < LAST_STEPS_TIME; i++)
-            sum += m_lastSteps[i];
-        //qDebug() << sum;
+            sum += m_lastSteps[i] * (i + 1) * SPEED_WEIGHT;
 
         if(isRunning())
             speed = sum * m_stepLength * (3600 / LAST_STEPS_TIME);
@@ -313,6 +314,17 @@ public:
         }
     }
 
+    bool getFreeze() {
+        return m_freezeTimer;
+    }
+    void setFreeze(bool f) {
+        if(f != m_freezeTimer) {
+            m_freezeTimer = f;
+            settings.setValue("freeze_timer", QVariant(m_freezeTimer));
+            emit freezeChanged();
+        }
+    }
+
 //    void setGoalReachedNotification(QObject* n) {
 //        m_goalReachedNotification = n;
 //    }
@@ -345,6 +357,7 @@ private:
     double m_sensitivity;
     bool m_inverted;
     quint64 m_lastStepTimestamp;
+    bool m_freezeTimer;
 //    QObject* m_goalReachedNotification;
 
 signals:
@@ -364,6 +377,7 @@ signals:
      void sensitivityChanged();
      void invertedChanged();
      void calPerStepChanged();
+     void freezeChanged();
      void entryAdded(int t, int s);
 };
 #endif // APPCONTROLLER_H
