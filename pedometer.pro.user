@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by Qt Creator 2.3.1, 2011-11-29T21:42:24. -->
+<!-- Written by Qt Creator 2.3.1, 2011-12-01T11:35:02. -->
 <qtcreator>
  <data>
   <variable>ProjectExplorer.Project.ActiveTarget</variable>
@@ -248,7 +248,7 @@
        <value type="QDateTime">2011-11-05T12:47:25</value>
        <value type="QDateTime">2011-10-09T14:27:05</value>
        <value type="QDateTime">2011-10-05T08:39:54</value>
-       <value type="QDateTime">2011-11-29T21:41:34</value>
+       <value type="QDateTime">2011-12-01T11:33:46</value>
       </valuelist>
      </valuemap>
      <value type="int" key="ProjectExplorer.BuildStepList.StepsCount">2</value>

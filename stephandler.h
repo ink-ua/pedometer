@@ -35,7 +35,7 @@ public:
     StepHandler(/*RotationFilter& rf*/) {
         mYOffset = 240;
         mScale = -8;
-        mLowerLimit = 5;
+        mLowerLimit = 10;
         //mUpperLimit = 500;
         mLastMatch = -1;
         //mRotationFilter = rf;
@@ -51,7 +51,7 @@ public:
         qreal vSum = 0;
         for(int i = 0; i < 3; i++)
             vSum += mYOffset + values[i] * mScale;
-        float v = vSum * (0.5 + appController->getSensitivity());
+        float v = vSum * appController->getSensitivity();
 
         short direction = (v > mLastValue ? 1 : (v < mLastValue ? -1 : 0));
         if (direction == -mLastDirection) {
@@ -64,7 +64,7 @@ public:
             if(time - mExtremeTime[extType] > 50 && time - mExtremeTime[1 - extType] > 50) {
                     quint64 timeDiff = mExtremeTime[1 - extType] - mExtremeTime[extType];
 
-                    qDebug() << (diff > mLowerLimit) /*<< (diff < mUpperLimit)*/ << (timeDiff > 100 / appController->getSensitivity()) << (timeDiff < 1000);
+                    qDebug() << diff << (diff > mLowerLimit) /*<< (diff < mUpperLimit)*/ << (timeDiff > 100 / appController->getSensitivity()) << (timeDiff < 1000);
                     if (diff > mLowerLimit /*&& diff < mUpperLimit*/ && timeDiff > 100 / appController->getSensitivity() && timeDiff < 1000) {
                         bool isAlmostAsLargeAsPrevious = diff > (mLastDiff * 0.4);
                         bool isPreviousLargeEnough = mLastDiff > (diff * 0.2);
