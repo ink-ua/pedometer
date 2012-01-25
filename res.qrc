@@ -7,5 +7,6 @@
         <file>qml/Preferences.qml</file>
         <file>human.png</file>
         <file>human-white.png</file>
+        <file>qml/Workouts.qml</file>
     </qresource>
 </RCC>

@@ -8,15 +8,13 @@
 #include <QDesktopServices>
 //#include <qmdisplaystate.h>
 
+#include "appcontroller.h"
 #include "rotationfilter.h"
 #include "stephandler.h"
 #include "historyprovider.h"
-#include "appcontroller.h"
 
 #define APP_NAME "Pedometer"
 #define SQLITE_V ".sqlite3"
-
-AppController* appController;
 
 int main(int argc, char *argv[])
 {
@@ -25,8 +23,9 @@ int main(int argc, char *argv[])
     QDir().mkpath(baseDataPath);
     //qDebug() << baseDataPath;
     db.setDatabaseName(baseDataPath + "/pedometer" + SQLITE_V);
-    if(!db.open())
-        ;//qDebug() << "Error opening database:" << db.lastError().number();
+    if(!db.open()) {
+        //qDebug() << "Error opening database:" << db.lastError().number();
+    }
 
 //    db.exec("DROP TABLE history");
 
@@ -42,20 +41,20 @@ int main(int argc, char *argv[])
     QAccelerometer sensor;
     sensor.setDataRate(20);
     sensor.setProperty("alwaysOn", true);    
-    appController = new AppController(db, &sensor);
+    AppController::init(db, &sensor);
     StepHandler filter;
     sensor.addFilter(&filter);
 //    RotationFilter rfilter;
 //    rotation.addFilter(rfilter);
-    QObject::connect(&filter, SIGNAL(onStep()), appController, SLOT(incStep()));
+    QObject::connect(&filter, SIGNAL(onStep()), AppController::getInstance(), SLOT(incStep()));
 
     HistoryProvider historyProvider;
-    QObject::connect(appController, SIGNAL(entryAdded(int, int)), &historyProvider, SLOT(addEntry(int, int)));
+    QObject::connect(AppController::getInstance(), SIGNAL(entryAdded(int, int)), &historyProvider, SLOT(addEntry(int, int)));
 
     QApplication app(argc, argv);
     QDeclarativeView view;
     view.connect(view.engine(), SIGNAL(quit()), SLOT(close()));
-    view.rootContext()->setContextProperty("appcontroller", appController);
+    view.rootContext()->setContextProperty("appcontroller", AppController::getInstance());
     view.rootContext()->setContextProperty("historyProvider", &historyProvider);
     //view.rootContext()->setContextProperty("historyModel", (QObject*)&(appController->history));
     //view.rootContext()->setContextProperty("historyModel", QVariant::fromValue(*(appController->history.getList())));
@@ -67,7 +66,7 @@ int main(int argc, char *argv[])
     view.showFullScreen();
     sensor.start();
 
-    QObject::connect(&app, SIGNAL(lastWindowClosed()), appController, SLOT(onClose()));
+    QObject::connect(&app, SIGNAL(lastWindowClosed()), AppController::getInstance(), SLOT(onClose()));
 
     return app.exec();
 }

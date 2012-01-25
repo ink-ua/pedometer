@@ -4,10 +4,9 @@
 #include <QObject>
 #include <QtSql/QSqlQuery>
 //#include <QDebug>
-#include "historyentry.h"
-#include "appcontroller.h"
 
-extern AppController* appController;
+#include "appcontroller.h"
+#include "historyentry.h"
 
 class HistoryProvider : public QObject
 {
@@ -24,7 +23,7 @@ public:
         //qDebug() << "* they want history";
         m_totalTime = 0;
         m_totalSteps = 0;
-        q = appController->m_db.exec("SELECT SUM(seconds), SUM(steps), date FROM history GROUP BY date ORDER BY date DESC");
+        q = AppController::getInstance()->m_db.exec("SELECT SUM(seconds), SUM(steps), date FROM history GROUP BY date ORDER BY date DESC");
     }
 
     Q_INVOKABLE QObject* getNextEntry() {
@@ -51,7 +50,7 @@ public:
         return m_totalTime;
     }
     double getCalTotal() {
-        return m_totalSteps * appController->getCalPerStep();
+        return m_totalSteps * AppController::getInstance()->getCalPerStep();
     }
 
     void addTotal(int t, int s) {
@@ -77,7 +76,7 @@ signals:
 
 public slots:
     void addEntry(int t, int s) {
-        QSqlQuery q(appController->m_db);
+        QSqlQuery q(AppController::getInstance()->m_db);
         q.prepare("INSERT INTO history(seconds, steps) VALUES(:seconds, :steps)");
         q.bindValue(":seconds", t);
         q.bindValue(":steps", s);

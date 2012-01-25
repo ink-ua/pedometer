@@ -22,7 +22,8 @@ CONFIG += mobility
 MOBILITY += sensors
 
 # The .cpp file which was generated for your project. Feel free to hack it.
-SOURCES += main.cpp
+SOURCES += main.cpp \
+    appcontroller.cpp
 
 OTHER_FILES += \
     qml/MainPage.qml \
@@ -40,7 +41,8 @@ OTHER_FILES += \
     qml/InfoBox.qml \
     qml/Preferences.qml \
     human-white.png \
-    splash.png
+    splash.png \
+    qml/Workouts.qml
 
 RESOURCES += \
     res.qrc

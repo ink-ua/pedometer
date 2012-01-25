@@ -13,8 +13,13 @@ PageStackWindow {
             Preferences { id: prefPage }
         }
 
+        anchors {
+            fill: parent;
+            margins: platformStyle.paddingMedium
+        }
+
         tools: ToolBarLayout {
-            id: tools
+            id: mainTools
             anchors.bottom: parent.bottom
             ButtonRow {
                 TabButton {
@@ -30,21 +35,19 @@ PageStackWindow {
                         if(!histPage) {
                             var component = Qt.createComponent("History.qml");
                             if (component.status == Component.Ready)
-                                histPage = component.createObject(tabgroup); // , { id: histPage }
+                                histPage = component.createObject(tabgroup);
                         }
                         tabgroup.currentTab = histPage;
                     }
                 }
-                TabButton {                    
+                TabButton {
                     iconSource: "image://theme/icon-m-toolbar-settings" + (appcontroller.inverted ? "-white" : "")
                     tab: prefPage
                 }
             }
         }
     }
-//    {
-//    id: goalReachedNotification
-//    }
+
     Component.onCompleted: {
         theme.inverted = appcontroller.inverted
     }
