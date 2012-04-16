@@ -5,16 +5,16 @@ Page {
     id: prefPage
     orientationLock: PageOrientation.LockPortrait
 
-    Label {
-        id: title
-        anchors.top: parent.top
-        anchors.topMargin: 10
-        width: parent.width
-        text: "Preferenses<hr>"
-        style: LabelStyle {
-            fontPixelSize: 40
-        }
-    }
+//    Label {
+//        id: title
+//        anchors.top: parent.top
+//        anchors.topMargin: 10
+//        width: parent.width
+//        text: "Preferenses<hr>"
+//        style: LabelStyle {
+//            fontPixelSize: 40
+//        }
+//    }
 
     LabelStyle {
         id: prefLabel
@@ -22,36 +22,21 @@ Page {
     }
 
     Column {
-        spacing: 40
-        anchors.margins: 10
-        anchors.top: title.bottom
+        spacing: 35
+        anchors.margins: 20
+        anchors.top: parent.top
         anchors.horizontalCenter: parent.horizontalCenter
-//        Column {
-//            spacing: 10
-//            Label {
-//                text: "Units"
-//                platformStyle: prefLabel
-//            }
-//            ButtonRow {
-//                Button {
-//                    text: "Metric"
-//                }
-//                Button {
-//                    text: "No alternatives"
-//                }
-//            }
-//        }
         Grid {
             columns: 2
             spacing: 30
             Label {
                 id:lblStep
-                text: "Step length"
+                text: "Step length (m)"
                 platformStyle: prefLabel
             }
             TextField {
                 id: stepLength
-                width: 150
+                width: 130
                 onTextChanged: appcontroller.stepLength = stepLength.text
                 inputMethodHints: Qt.ImhDigitsOnly
                 validator: DoubleValidator {
@@ -67,12 +52,12 @@ Page {
             spacing: 30
             Label {
                 id:lblDaily
-                text: "Daily distance"
+                text: "Daily distance (km)"
                 platformStyle: prefLabel
             }
             TextField {
                 id: daily
-                width: 150
+                width: 130
                 text: appcontroller.daily / 1000.0
                 inputMethodHints: Qt.ImhDigitsOnly
                 validator: DoubleValidator {
@@ -83,18 +68,27 @@ Page {
                 anchors.verticalCenter: lblDaily.verticalCenter
             }
         }
-        //            Row {
-        //                spacing: 10
-        //                Label {
-        //                    id:lblStop
-        //                    text: "Pause when stop walking"
-        //                }
-        //                Switch {
-        //                    id: stop
-        //                    checked: appcontroller.pauseWalking
-        //                    anchors.verticalCenter: lblStop.verticalCenter
-        //                }
-        //            }
+        Grid {
+            columns: 2
+            spacing: 30
+            Label {
+                id:lblWeight
+                text: "Weight (kg)"
+                platformStyle: prefLabel
+            }
+            TextField {
+                id: weight
+                width: 130
+                onTextChanged: appcontroller.weight = weight.text
+                inputMethodHints: Qt.ImhDigitsOnly
+                validator: DoubleValidator {
+                    bottom: 0
+                    top: 500
+                }
+                text: appcontroller.weight
+                anchors.verticalCenter: lblWeight.verticalCenter
+            }
+        }
         Column {
             spacing: 10
             Label {
@@ -145,6 +139,35 @@ Page {
                     appcontroller.freeze = checked;
                 }
                 anchors.verticalCenter: lblFreeze.verticalCenter
+            }
+        }
+        Column {
+            spacing: 10
+            Label {
+                text: "Units"
+                platformStyle: prefLabel
+            }
+            ButtonRow {
+                Button {
+                    id: metric
+                    text: "Metric"
+                }
+                Button {
+                    id: imperial
+                    text: "Imperial"
+                }
+                checkedButton: {
+                    if(appcontroller.units === 0)
+                        return metric;
+                    else
+                        return imperial;
+                }
+                onCheckedButtonChanged: {
+                    if(checkedButton === metric)
+                        appcontroller.units = 0;
+                    else
+                        appcontroller.units = 1;
+                }
             }
         }
     }

@@ -68,55 +68,64 @@ Page {
         //activeFocus: opacity: 0.8
         anchors.top: colMain.bottom
         anchors.horizontalCenter: parent.horizontalCenter
-        anchors.topMargin: 50
+        anchors.topMargin: 40
         width: step.width
-        height: 50
-        Row {
-            anchors.margins: 10
-            anchors.centerIn: parent
-            spacing: 10
+        height: 60
+
+        Label {
+            text: "Today"
+            id: todayLbl
+            anchors.left: parent.left
+            anchors.leftMargin: 5
+            anchors.verticalCenter: parent.verticalCenter
+            platformStyle: LabelStyle {
+                textColor: "white"
+                fontPixelSize: 30
+            }
+        }
+        Column {
+            id:col
+            anchors.left: todayLbl.right
+            anchors.leftMargin: 5
+            anchors.right: targetLbl.left
+            anchors.rightMargin: 5
+            anchors.verticalCenter: parent.verticalCenter
+            ProgressBar {
+                id: pb
+                width: parent.width
+                minimumValue: 0
+                maximumValue: appcontroller.daily
+                value: appcontroller.todayDistance
+            }
             Label {
-                text: "Today"
+                anchors.left: pb.left
+                anchors.leftMargin: {
+                    var pos = (pb.width / appcontroller.daily) * appcontroller.todayDistance;
+                    if(pos < pb.width - width / 2) {
+                        pos -= width / 2;
+                        if(pos < 0)
+                            pos = 0;
+                    }
+                    else
+                        pos = pb.width - width;
+                    return pos;
+                }
+                text: appcontroller.formatDistance(appcontroller.todayDistance)
                 platformStyle: LabelStyle {
-                    textColor: "white"
+                    textColor: "yellow"
                     fontPixelSize: 30
                 }
             }
-            Column {
-                id:col
-                ProgressBar {
-                    id: pb
-                    width: 230
-                    minimumValue: 0
-                    maximumValue: appcontroller.daily
-                    value: appcontroller.todayDistance
-                }
-                Label {
-                    anchors.left: pb.left
-                    anchors.leftMargin: {
-                        var pos = (pb.width / appcontroller.daily) * appcontroller.todayDistance;
-                        if(pos < pb.width - width / 2) {
-                            pos -= width / 2;
-                            if(pos < 0)
-                                pos = 0;
-                        }
-                        else
-                            pos = pb.width - width;
-                        return pos;
-                    }
-                    text: appcontroller.formatDistance(appcontroller.todayDistance)
-                    platformStyle: LabelStyle {
-                        textColor: "yellow"
-                        fontPixelSize: 30
-                    }
-                }
-            }
-            Label {
-                text: appcontroller.formatDistance(appcontroller.daily)
-                platformStyle: LabelStyle {
-                    textColor: "white"
-                    fontPixelSize: 30
-                }
+        }
+        Label {
+            id: targetLbl
+            text: appcontroller.formatDistance(appcontroller.daily)
+            anchors.right: parent.right
+            anchors.rightMargin: 5
+            anchors.verticalCenter: parent.verticalCenter
+            platformStyle: LabelStyle {
+                textColor: "white"
+                fontPixelSize: 30
             }
         }
     }

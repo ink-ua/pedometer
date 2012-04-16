@@ -11,22 +11,27 @@ Page {
             historyModel.append(historyProvider.getNextEntry());
     }
 
-    Connections {
-        target: historyProvider
-        onEntryAdded: {
-            console.log(h.steps);
-            //historyModel.insert(0, h);
-        }
-    }
+//    Connections {
+//        target: historyProvider
+//        entryAddedToList: {
+//            console.log(h.steps);
+//            historyModel.insert(0, h);
+//        }
+//    }
 
-    function calcRateColor(steps) {
-        var green = parseInt((steps * appcontroller.stepLength) / (appcontroller.daily / 0xFF));
+    function calcRateColor(distance) {
+        var green = parseInt(distance / (appcontroller.daily / 0xFF));
         var red = 0;
         if(green > 0xFF)
             green = 0xFF;
         else
             red = 0xFF - green;
-        return "#" + (red <= 0xF ? "0" : "") + red.toString(16) + (green <= 0xF ? "0" : "") + green.toString(16) + "00";
+        var result = "#"
+                + (red <= 0xF ? "0" : "") + red.toString(16) // red component
+                + (green <= 0xF ? "0" : "") + green.toString(16) // green component
+                + "00"; // no blue
+        //console.log(result);
+        return result;
     }
 
     ListModel {
@@ -77,6 +82,8 @@ Page {
         property int steps
         property string time
         property int seconds
+        property double distance
+        property double calories
 
         title: Label {
             text: detail.day + " " + detail.month
@@ -133,7 +140,7 @@ Page {
                     }
                 }
                 Label {
-                    text: appcontroller.formatDistance(detail.steps * appcontroller.stepLength)
+                    text: appcontroller.formatDistance(detail.distance)
                     font.pixelSize: detail.fontSize
                     font.bold: true
                     style: LabelStyle {
@@ -148,7 +155,7 @@ Page {
                     }
                 }
                 Label {
-                    text: appcontroller.formatDistance((detail.steps * appcontroller.stepLength * 3600) / detail.seconds) + "/h"
+                    text: appcontroller.formatSpeed(appcontroller.calculateSpeed(detail.distance, detail.seconds))
                     font.pixelSize: detail.fontSize
                     font.bold: true
                     style: LabelStyle {
@@ -163,7 +170,7 @@ Page {
                     }
                 }
                 Label {
-                    text: detail.steps * appcontroller.calPerStep
+                    text: detail.calories
                     font.pixelSize: detail.fontSize
                     font.bold: true
                     style: LabelStyle {
@@ -179,7 +186,7 @@ Page {
                 }
                 Label {
                     id: rate
-                    text: appcontroller.formatPercent(detail.steps * appcontroller.stepLength / (appcontroller.daily / 100.0))
+                    text: appcontroller.formatPercent(appcontroller.calculateRate(detail.distance))
                     font.pixelSize: detail.fontSize
                     font.bold: true
                     style: LabelStyle {
@@ -187,18 +194,18 @@ Page {
                     }
                 }
             }
-            Button {
-                text: "Workouts"
-                anchors.horizontalCenter: parent.horizontalCenter
-                onClicked: {
-                    var component = Qt.createComponent("qrc:/qml/Workouts.qml");
-                    if (component.status == Component.Ready)
-                        appWindow.pageStack.push(component);
-                    else
-                        console.log("Error loading component:", component.errorString());
-                    detail.close();
-                }
-            }
+//            Button {
+//                text: "Workouts"
+//                anchors.horizontalCenter: parent.horizontalCenter
+//                onClicked: {
+//                    var component = Qt.createComponent("qrc:/qml/Workouts.qml");
+//                    if (component.status == Component.Ready)
+//                        appWindow.pageStack.push(component);
+//                    else
+//                        console.log("Error loading component:", component.errorString());
+//                    detail.close();
+//                }
+//            }
         }
     }
 
@@ -206,16 +213,15 @@ Page {
         id: tabGroup
         currentTab: total
         anchors.top: buttonRow.bottom
-        anchors.topMargin: 20
-        height: parent.height - buttonRow.height - anchors.topMargin
+        height: parent.height - buttonRow.height
         Item {
             id:total
             anchors.centerIn: parent
             height: parent.height
             width: 430
             Column {
-                spacing: 20
-                anchors.topMargin: 30
+                spacing: 10
+                anchors.centerIn: parent
                 width: parent.width
                 InfoBox {
                     id: totalSteps
@@ -232,19 +238,25 @@ Page {
                 InfoBox {
                     id: totalDistance
                     title: "Total distance"
-                    text: appcontroller.formatDistance(historyProvider.totalSteps * appcontroller.stepLength)
+                    text: appcontroller.formatDistance(historyProvider.totalDistance)
                     width:parent.width
                 }
                 InfoBox {
                     id: totalCalories
                     title: "Total calories"
-                    text: historyProvider.calTotal
+                    text: historyProvider.totalCalories
                     width:parent.width
                 }
                 InfoBox {
                     id: avgSpeed
                     title: "Average speed"
-                    text: appcontroller.formatDistance((historyProvider.totalSteps * appcontroller.stepLength * 3600) / historyProvider.totalTime) + "/h"
+                    text: appcontroller.formatSpeed(appcontroller.calculateSpeed(historyProvider.totalDistance, historyProvider.totalTime))
+                    width:parent.width
+                }
+                InfoBox {
+                    id: avgRate
+                    title: "Average daily rate"
+                    text: appcontroller.formatPercent(historyProvider.avgRate)
                     width:parent.width
                 }
             }
@@ -267,7 +279,7 @@ Page {
 
                 delegate: Item {
                     id: wrapper
-                    property string rateColor: calcRateColor(steps)
+                    property string rateColor: calcRateColor(distance)
                     height: 70
                     anchors.left: parent.left
                     anchors.leftMargin: 5
@@ -339,6 +351,8 @@ Page {
                             detail.rateColor = rateColor;
                             detail.steps = steps;
                             detail.time = time;
+                            detail.distance = distance;
+                            detail.calories = calories;
                             detail.seconds = seconds;
                             detail.open();
                         }

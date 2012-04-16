@@ -3,8 +3,6 @@
 
 #include <QObject>
 #include <QString>
-#include <QtSql/QSqlDatabase>
-#include <QtSql/QSqlQuery>
 #include <QVariant>
 //#include <QDebug>
 #include <QDate>
@@ -15,14 +13,19 @@
 #include <QDeclarativeEngine>
 #include <QDeclarativeComponent>
 
-#include "historyentry.h"
-//#include "historymodel.h"
+#include "formatter.h"
 
 QTM_USE_NAMESPACE
 
 #define LAST_STEPS_TIME 10
 #define SPEED_WEIGHT 2.0 / (1 + LAST_STEPS_TIME);
 #define EPS 0.001
+
+#define CALORIES_PER_STEP_BASE 0.04
+#define BASE_WEIGHT 50 // kg
+#define CALORIES_WEIGHT_FACTOR 0.0005
+
+#define CURRENT_VERSION "1.2.0"
 
 class AppController : public QObject
 {
@@ -42,26 +45,26 @@ class AppController : public QObject
     Q_PROPERTY(bool inverted READ getInverted WRITE setInverted NOTIFY invertedChanged)
     Q_PROPERTY(double calPerStep READ getCalPerStep NOTIFY calPerStepChanged)
     Q_PROPERTY(bool freeze READ getFreeze WRITE setFreeze NOTIFY freezeChanged)
+    Q_PROPERTY(int units READ getUnits WRITE setUnits NOTIFY unitsChanged)
+    Q_PROPERTY(double weight READ getWeight WRITE setWeight NOTIFY weightChanged)
 
 public:
-    static void init(QSqlDatabase db, QAccelerometer* s) {
-        INSTANCE = new AppController(db, s);
+    static void init(QAccelerometer* s) {
+        INSTANCE = new AppController(s);
     }
     static AppController* getInstance() {
         return INSTANCE;
-    }
-
-    ~AppController(){
-        m_db.close();
-        QSqlDatabase::removeDatabase(m_db.connectionName());
     }
 
     double getCalPerStep() {
         return m_calPerStep;
     }
 
-    double getTodayDistance() {
-        double today = (m_todaySteps + m_steps) * m_stepLength;
+    void setTodayDistance(double td) {
+        m_todayDistance = td;
+    }
+    double getTodayDistance() const {
+        double today = m_todayDistance + m_steps * m_stepLength;
         return today;
     }
 
@@ -73,6 +76,28 @@ public:
             m_sensitivity = s;
             settings.setValue("sensitivity", QVariant(s));
             emit sensitivityChanged();
+        }
+    }
+
+    double getWeight() {
+        return m_weight;
+    }
+    void setWeight(double w) {
+        if(w > 0 && fabs(m_weight - w) > EPS) {
+            m_weight = w;
+            settings.setValue("weight", QVariant(w));
+            emit weightChanged();
+        }
+    }
+
+    int getUnits() {
+        return Formatter::getInstance()->getUnits();
+    }
+    void setUnits(int u) {
+        if(u != getUnits()) {
+            Formatter::getInstance()->setUnits(u);
+            settings.setValue("units", QVariant(u));
+            emit unitsChanged();
         }
     }
 
@@ -112,10 +137,6 @@ public:
         }
     }
 
-//    int getTotalSteps() {
-//        return m_totalSteps;
-//    }
-
     int getSteps() {
         return m_steps;
     }
@@ -142,12 +163,8 @@ public:
     }
 
     double getCal() {
-        return m_steps * m_calPerStep;
+        return m_steps * getCalPerStep();
     }
-
-//    double getCalTotal() {
-//        return m_totalSteps * m_calPerStep;
-//    }
 
     int getSeconds() {
         return m_seconds;
@@ -168,24 +185,24 @@ public:
             } else {
                 m_lastSecond++;
             }
+
+            // reset after midnight
+            QDate newCurrent = QDate::currentDate();
+            if(m_currentDate != newCurrent) {
+                reset();
+                m_todayDistance = 0;
+                m_currentDate = newCurrent;
+                setRunning(true);
+            }
         }
     }
 
-//    Q_INVOKABLE void loadHistory() {
-//        QDeclarativeEngine engine;
-//        QDeclarativeComponent component(&engine, QUrl::fromLocalFile("History.qml"));
-//        QObject* model = component.findChild<QObject*>("historyModel");
-//        //QObject *object = component.create();
-//        QMetaObject::invokeMethod(model, "append", (QObject*)new HistoryEntry(60, 10, "2011-10-10"));
-//                    //delete object;
-
-//    }
-
     QString getAvgSpeed() {
         double speed = 0;
-        if(m_seconds != 0)
-            speed = (m_steps * m_stepLength * 3600) / m_seconds;
-        return formatDistance(speed) + "/h";
+        if(m_seconds > 0 && m_steps > 0) {
+            speed = calculateSpeed(m_steps * m_stepLength, m_seconds);
+        }
+        return formatSpeed(speed);
     }
 
     QString getSpeed() {
@@ -195,40 +212,20 @@ public:
         for(int i = 0; i < LAST_STEPS_TIME; i++)
             sum += m_lastSteps[i] * (i + 1) * SPEED_WEIGHT;
 
-        if(isRunning())
-            speed = sum * m_stepLength * (3600 / LAST_STEPS_TIME);
-        return formatDistance(speed) + "/h";
+        if(isRunning()) {
+            speed = calculateSpeed(sum * m_stepLength, LAST_STEPS_TIME);
+        }
+        return formatSpeed(speed);
     }
 
-    static QString getCurrentDate() {
-        return QDate::currentDate().toString("yyyy-MM-dd");
+    QDate getCurrentDate() {
+        return m_currentDate;
     }
 
     Q_INVOKABLE void save() {
         if(m_steps > 0) {
-//            QSqlQuery q(m_db);
-//            q.prepare("INSERT INTO history(seconds, steps) VALUES(:seconds, :steps)");
-//            q.bindValue(":seconds", m_seconds);
-//            q.bindValue(":steps", m_steps);
-//            q.exec();
-
-            emit entryAdded(m_seconds, m_steps);
-
-//            QDate currentDate = QDate::currentDate();
-//            HistoryEntry* first;
-//            if(history.rowCount() > 0 && (first = (HistoryEntry*)history.get(0))->getDate() == currentDate) {
-//                first->plusSteps(m_steps);
-//                first->plusTime(m_seconds);
-//            }
-//            else
-//                history.insertRow(0, new HistoryEntry(m_seconds, m_steps, currentDate));
-
-            //m_totalSteps += m_steps;
-            m_todaySteps += m_steps;
-//            m_totalTime += m_seconds;
-//            totalStepsChanged();
-//            totalTimeChanged();
-//            calTotalChanged();
+            emit entryAdded(m_seconds, m_steps, getDistance(), getCal(), m_currentDate);
+            m_todayDistance += m_steps * getStepLength();
         }
     }
 
@@ -239,37 +236,28 @@ public:
         setSeconds(0);
     }
 
-    Q_INVOKABLE static QString formatTime(int seconds) {
-        int sec = seconds % 60;
-        int min = (seconds / 60) % 60;
-        int hr = (seconds / 3600) % 24;
-
-        QString ret;
-        ret.sprintf("%.2d:%.2d:%.2d", hr, min, sec);
-        return ret;
+    Q_INVOKABLE QString formatTime(int seconds) const {
+        return Formatter::getInstance()->formatTime(seconds);
     }
 
     QString getTime() const {
         return formatTime(m_seconds);
     }
 
-//    int getTotalTime() const {
-//        return m_totalTime;
-//    }
+    Q_INVOKABLE double calculateSpeed(double distance, int seconds) {
+        return (distance * 3600) / seconds;
+    }
 
     Q_INVOKABLE QString formatDistance(double distance) {
-        QString ret;
-        if(distance > 1000)
-            ret.sprintf("%.2f km", distance / 1000.0);
-        else
-            ret.sprintf("%.2f m", distance);
-        return ret;
+        return Formatter::getInstance()->formatDistance(distance);
+    }
+
+    Q_INVOKABLE QString formatSpeed(double speed) {
+        return Formatter::getInstance()->formatSpeed(speed);
     }
 
     Q_INVOKABLE QString formatPercent(double v) {
-        QString ret;
-        ret.sprintf("%.2f %", v);
-        return ret;
+        return Formatter::getInstance()->formatPercent(v);
     }
 
     double getDistance() const {
@@ -298,23 +286,50 @@ public:
         }
     }
 
+    QString getVersion() const {
+        return m_version;
+    }
+    void updateVersion() {
+        if(m_version != CURRENT_VERSION) {
+            emit versionChanged(m_version, CURRENT_VERSION);
+            m_version = CURRENT_VERSION;
+            settings.setValue("version", QVariant(m_version));
+        }
+    }
+
+    Q_INVOKABLE double calculateRate(double distance) {
+        return distance / (m_daily / 100.0);
+    }
+
 //    void setGoalReachedNotification(QObject* n) {
 //        m_goalReachedNotification = n;
 //    }
 
-    //HistoryModel history;
-    QSqlDatabase m_db;
-
 public slots:
+
     void incStep() {
         setSteps(getSteps() + 1);
     }
+
     void onClose() {
         save();
+        delete INSTANCE;
+    }
+
+    void onWeightChanged() {
+        m_calPerStep = CALORIES_PER_STEP_BASE + (m_weight - BASE_WEIGHT) * CALORIES_WEIGHT_FACTOR;
+    }
+
+    void onUnitsChanged() {
+        emit distanceChanged();
+        emit speedChanged();
+        emit todayDistanceChanged();
+        emit dailyChanged();
+        emit avgSpeedChanged();
     }
 
 private:
-    AppController(QSqlDatabase db, QAccelerometer* s);
+    AppController(QAccelerometer* s);
 
     static AppController* INSTANCE;
 
@@ -323,7 +338,8 @@ private:
     int m_seconds;
     double m_stepLength;
     double m_daily;
-    int m_todaySteps;
+    double m_todayDistance;
+    double m_weight;
     double m_calPerStep;
     short m_lastSteps[LAST_STEPS_TIME];
     short m_lastSecond;
@@ -333,6 +349,8 @@ private:
     bool m_inverted;
     quint64 m_lastStepTimestamp;
     bool m_freezeTimer;
+    QString m_version;
+    QDate m_currentDate;
 
 signals:
      void runningChanged();
@@ -348,7 +366,10 @@ signals:
      void sensitivityChanged();
      void invertedChanged();
      void calPerStepChanged();
+     void weightChanged();
      void freezeChanged();
-     void entryAdded(int t, int s);
+     void unitsChanged();
+     void entryAdded(int t, int s, double d, double c, QDate date);
+     void versionChanged(QString oldVersion, QString newVersion);
 };
 #endif // APPCONTROLLER_H

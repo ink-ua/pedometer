@@ -5,6 +5,9 @@
 #include <QVariant>
 #include <QDate>
 
+#include "formatter.h"
+#include "appcontroller.h"
+
 class HistoryEntry : public QObject
 {
     Q_OBJECT
@@ -12,27 +15,30 @@ class HistoryEntry : public QObject
     Q_PROPERTY(QString time READ getTime NOTIFY timeChanged)
     Q_PROPERTY(int seconds READ getSeconds NOTIFY timeChanged)
     Q_PROPERTY(int steps READ getSteps NOTIFY stepsChanged)
+    Q_PROPERTY(double distance READ getDistance NOTIFY distanceChanged)
+    Q_PROPERTY(double calories READ getCalories NOTIFY caloriesChanged)
     Q_PROPERTY(int day READ getDay NOTIFY dateChanged)
     Q_PROPERTY(QString month READ getMonth NOTIFY dateChanged)
     //Q_PROPERTY(int intMonth READ getIntMonth NOTIFY dateChanged)
 
 public:
-    enum HISTORY_ROLES { STEPS = Qt::UserRole + 1, TIME, DAY, MONTH, SECONDS };
+    enum HISTORY_ROLES { STEPS = Qt::UserRole + 1, TIME, DAY, MONTH, SECONDS, DISTANCE, CALORIES };
 
-    HistoryEntry(QObject *parent=0) : QObject(parent) {}
-    HistoryEntry(int time, int steps, QString date, QObject *parent=0)
-        : QObject(parent), m_time(time), m_steps(steps), m_date(QDate::fromString(date, "yyyy-MM-dd")) {}
-    HistoryEntry(int time, int steps, QDate date, QObject *parent=0)
-        : QObject(parent), m_time(time), m_steps(steps), m_date(date) {}
+    //HistoryEntry(QObject *parent=0) : QObject(parent) {}
+    HistoryEntry(int time, int steps, double distance, double calories, QString date, QObject *parent=0)
+        : QObject(parent), m_time(time), m_steps(steps), m_distance(distance), m_calories(calories),
+          m_date(QDate::fromString(date, "yyyy-MM-dd"))
+    {
+        init();
+    }
+    HistoryEntry(int time, int steps, double distance, double calories, QDate date, QObject *parent=0)
+        : QObject(parent), m_time(time), m_steps(steps), m_distance(distance), m_calories(calories), m_date(date)
+    {
+        init();
+    }
 
-    static QString formatTime(int seconds) {
-        int sec = seconds % 60;
-        int min = (seconds / 60) % 60;
-        int hr = (seconds / 3600) % 24;
-
-        QString ret;
-        ret.sprintf("%.2d:%.2d:%.2d", hr, min, sec);
-        return ret;
+    void init() {
+        QObject::connect(AppController::getInstance(), SIGNAL(unitsChanged()), this, SLOT(onUnitsChanged()));
     }
 
     QVariant data(int role) const {
@@ -53,6 +59,12 @@ public:
         case SECONDS:
             v = QVariant::fromValue(getSeconds());
             break;
+        case DISTANCE:
+            v = QVariant::fromValue(getDistance());
+            break;
+        case CALORIES:
+            v = QVariant::fromValue(getCalories());
+            break;
         default:
             v = QVariant();
         }
@@ -72,7 +84,7 @@ public:
     }
 
     QString getTime() const {
-        return formatTime(m_time);
+        return Formatter::getInstance()->formatTime(m_time);
     }
 
     int getSeconds() const {
@@ -81,16 +93,32 @@ public:
 
     void plusTime(int s) {
         m_time += s;
-        emit dataChanged();
+        emit timeChanged();
     }
 
     void plusSteps(int s) {
         m_steps += s;
-        emit dataChanged();
+        emit stepsChanged();
     }
 
     int getSteps() const {
         return m_steps;
+    }
+
+    double getDistance() const {
+        return m_distance;
+    }
+    void plusDistance(double d) {
+        m_distance += d;
+        emit distanceChanged();
+    }
+
+    double getCalories() const {
+        return m_calories;
+    }
+    void plusCalories(double c) {
+        m_calories += c;
+        emit caloriesChanged();
     }
 
     int getDay() const {
@@ -105,15 +133,23 @@ public:
 //        return m_date.month() + m_date.year() * 12;
 //    }
 
+public slots:
+    void onUnitsChanged() {
+        emit distanceChanged();
+    }
+
 signals:
     void timeChanged();
     void stepsChanged();
+    void distanceChanged();
+    void caloriesChanged();
     void dateChanged();
-    void dataChanged();
 
 private:
     int m_time;
     int m_steps;
+    double m_distance;
+    double m_calories;
     QDate m_date;
 };
 #endif // HISTORYENTRY_H

@@ -23,7 +23,9 @@ MOBILITY += sensors
 
 # The .cpp file which was generated for your project. Feel free to hack it.
 SOURCES += main.cpp \
-    appcontroller.cpp
+    appcontroller.cpp \
+    formatter.cpp \
+    dbutils.cpp
 
 OTHER_FILES += \
     qml/MainPage.qml \
@@ -61,7 +63,8 @@ HEADERS += \
     historyentry.h \
     stephandler.h \
     historyprovider.h \
-    rotationfilter.h
+    formatter.h \
+    dbutils.h
 
 contains(MEEGO_EDITION,harmattan) {
     icon.files = pedometer.png

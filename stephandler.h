@@ -1,15 +1,12 @@
 #ifndef STEPSENSOR_H
 #define STEPSENSOR_H
 
-//#define GRAVITY_EARTH 9.806650161743164f
-
 #include <QAccelerometerFilter>
 //#include <QDebug>
 #include <QDateTime>
 #include <math.h>
 
 #include "appcontroller.h"
-//#include "rotationfilter.h"
 
 QTM_USE_NAMESPACE
 
@@ -25,18 +22,16 @@ private:
     float mLastDiff;
     int mLastMatch;
     float mLastExtremes[2];
-//    RotationFilter mRotationFilter;
 //    quint64 mTime;
     quint64 mExtremeTime[2];
 
 public:
-    StepHandler(/*RotationFilter& rf*/) {
+    StepHandler() {
         mYOffset = 240;
         mScale = -8;
         mLowerLimit = 10;
         //mUpperLimit = 500;
         mLastMatch = -1;
-        //mRotationFilter = rf;
 
         mLastValue = 0;
     }
