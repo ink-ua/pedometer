@@ -40,6 +40,7 @@ int main(int argc, char *argv[])
     view.connect(view.engine(), SIGNAL(quit()), SLOT(close()));
     view.rootContext()->setContextProperty("appcontroller", AppController::getInstance());
     view.rootContext()->setContextProperty("historyProvider", &historyProvider);
+    view.rootContext()->setContextProperty("formatter", Formatter::getInstance());
 
 //    Object* notif = view.rootObject()->findChild<QObject *>("goalReachedNotification");
 //    appController->setGoalReachedNotificationObject(notif);

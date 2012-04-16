@@ -140,7 +140,7 @@ Page {
                     }
                 }
                 Label {
-                    text: appcontroller.formatDistance(detail.distance)
+                    text: formatter.formatDistance(detail.distance)
                     font.pixelSize: detail.fontSize
                     font.bold: true
                     style: LabelStyle {
@@ -155,7 +155,7 @@ Page {
                     }
                 }
                 Label {
-                    text: appcontroller.formatSpeed(appcontroller.calculateSpeed(detail.distance, detail.seconds))
+                    text: formatter.formatSpeed(appcontroller.calculateSpeed(detail.distance, detail.seconds))
                     font.pixelSize: detail.fontSize
                     font.bold: true
                     style: LabelStyle {
@@ -170,7 +170,7 @@ Page {
                     }
                 }
                 Label {
-                    text: detail.calories
+                    text: formatter.formatCalories(detail.calories)
                     font.pixelSize: detail.fontSize
                     font.bold: true
                     style: LabelStyle {
@@ -186,7 +186,7 @@ Page {
                 }
                 Label {
                     id: rate
-                    text: appcontroller.formatPercent(appcontroller.calculateRate(detail.distance))
+                    text: formatter.formatPercent(appcontroller.calculateRate(detail.distance))
                     font.pixelSize: detail.fontSize
                     font.bold: true
                     style: LabelStyle {
@@ -232,31 +232,31 @@ Page {
                 InfoBox {
                     id: totalTime
                     title: "Total time"
-                    text: appcontroller.formatTime(historyProvider.totalTime)
+                    text: formatter.formatTime(historyProvider.totalTime)
                     width: parent.width
                 }
                 InfoBox {
                     id: totalDistance
                     title: "Total distance"
-                    text: appcontroller.formatDistance(historyProvider.totalDistance)
+                    text: formatter.formatDistance(historyProvider.totalDistance)
                     width:parent.width
                 }
                 InfoBox {
                     id: totalCalories
                     title: "Total calories"
-                    text: historyProvider.totalCalories
+                    text: formatter.formatCalories(historyProvider.totalCalories)
                     width:parent.width
                 }
                 InfoBox {
                     id: avgSpeed
                     title: "Average speed"
-                    text: appcontroller.formatSpeed(appcontroller.calculateSpeed(historyProvider.totalDistance, historyProvider.totalTime))
+                    text: formatter.formatSpeed(appcontroller.calculateSpeed(historyProvider.totalDistance, historyProvider.totalTime))
                     width:parent.width
                 }
                 InfoBox {
                     id: avgRate
                     title: "Average daily rate"
-                    text: appcontroller.formatPercent(historyProvider.avgRate)
+                    text: formatter.formatPercent(historyProvider.avgRate)
                     width:parent.width
                 }
             }

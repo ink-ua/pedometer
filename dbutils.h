@@ -90,7 +90,6 @@ public slots:
         //qDebug("onClose()");
         m_db.close();
         QSqlDatabase::removeDatabase(m_db.connectionName());
-        delete instance;
     }
 
 private:

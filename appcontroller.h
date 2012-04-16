@@ -34,11 +34,10 @@ class AppController : public QObject
     Q_PROPERTY(double stepLength READ getStepLength WRITE setStepLength NOTIFY stepLengthChanged)
     Q_PROPERTY(double daily READ getDaily WRITE setDaily NOTIFY dailyChanged)
     Q_PROPERTY(int steps READ getSteps WRITE setSteps NOTIFY stepsChanged)
-    Q_PROPERTY(int seconds READ getSeconds WRITE setSeconds)
-    Q_PROPERTY(QString time READ getTime NOTIFY timeChanged)
+    Q_PROPERTY(int seconds READ getSeconds WRITE setSeconds NOTIFY timeChanged)
     Q_PROPERTY(double distance READ getDistance NOTIFY distanceChanged)
-    Q_PROPERTY(QString avgSpeed READ getAvgSpeed NOTIFY avgSpeedChanged)
-    Q_PROPERTY(QString speed READ getSpeed NOTIFY speedChanged)
+    Q_PROPERTY(double avgSpeed READ getAvgSpeed NOTIFY avgSpeedChanged)
+    Q_PROPERTY(double speed READ getSpeed NOTIFY speedChanged)
     Q_PROPERTY(double todayDistance READ getTodayDistance NOTIFY todayDistanceChanged)
     Q_PROPERTY(double cal READ getCal NOTIFY calChanged)
     Q_PROPERTY(double sensitivity READ getSensitivity WRITE setSensitivity NOTIFY sensitivityChanged)
@@ -197,15 +196,15 @@ public:
         }
     }
 
-    QString getAvgSpeed() {
+    double getAvgSpeed() {
         double speed = 0;
         if(m_seconds > 0 && m_steps > 0) {
             speed = calculateSpeed(m_steps * m_stepLength, m_seconds);
         }
-        return formatSpeed(speed);
+        return speed;
     }
 
-    QString getSpeed() {
+    double getSpeed() {
         double speed = 0;
 
         double sum = 0;
@@ -215,7 +214,7 @@ public:
         if(isRunning()) {
             speed = calculateSpeed(sum * m_stepLength, LAST_STEPS_TIME);
         }
-        return formatSpeed(speed);
+        return speed;
     }
 
     QDate getCurrentDate() {
@@ -236,28 +235,8 @@ public:
         setSeconds(0);
     }
 
-    Q_INVOKABLE QString formatTime(int seconds) const {
-        return Formatter::getInstance()->formatTime(seconds);
-    }
-
-    QString getTime() const {
-        return formatTime(m_seconds);
-    }
-
     Q_INVOKABLE double calculateSpeed(double distance, int seconds) {
         return (distance * 3600) / seconds;
-    }
-
-    Q_INVOKABLE QString formatDistance(double distance) {
-        return Formatter::getInstance()->formatDistance(distance);
-    }
-
-    Q_INVOKABLE QString formatSpeed(double speed) {
-        return Formatter::getInstance()->formatSpeed(speed);
-    }
-
-    Q_INVOKABLE QString formatPercent(double v) {
-        return Formatter::getInstance()->formatPercent(v);
     }
 
     double getDistance() const {
@@ -313,7 +292,6 @@ public slots:
 
     void onClose() {
         save();
-        delete INSTANCE;
     }
 
     void onWeightChanged() {

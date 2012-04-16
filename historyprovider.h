@@ -34,7 +34,6 @@ public:
         m_totalDistance = 0;
         m_totalCalories = 0;
         queryTotal = DBUtils::getInstance()->getTotalsByDay();
-        m_countEntries = queryTotal.size();
     }
 
     Q_INVOKABLE QObject* getNextEntry() {
@@ -50,6 +49,7 @@ public:
         if(h->getDate() == AppController::getInstance()->getCurrentDate()) {
             m_today = h;
         }
+        m_countEntries++;
         return h;
     }
 
@@ -77,7 +77,12 @@ public:
         return result;
     }
     double getAvgRate() {
-        return m_totalRate / m_countEntries;
+        double result = 0;
+        //qDebug() << m_totalRate << " " << m_countEntries;
+        if(m_totalRate > 0 && m_countEntries > 0) {
+            result = m_totalRate / m_countEntries;
+        }
+        return result;
     }
 
     void addTotal(int t, int s, double d, double c) {
@@ -111,7 +116,7 @@ signals:
     void totalTimeChanged();
     void avgSpeedChanged();
     void avgRateChanged();
-    void entryAddedToList(QObject* e);
+//    void entryAddedToList(QObject* e);
 
 public slots:
     void addEntry(int t, int s, double d, double c, QDate date) {
@@ -124,7 +129,7 @@ public slots:
         else {
             m_today = new HistoryEntry(t, s, d, c, date);
             m_countEntries++;
-            emit entryAddedToList(m_today);
+//            emit entryAddedToList(m_today);
         }
         addTotal(t, s, d, c);
     }

@@ -15,12 +15,12 @@ Page {
             InfoBox {
                 id: distance
                 title: "Distance"
-                text: appcontroller.formatDistance(appcontroller.distance)
+                text: formatter.formatDistance(appcontroller.distance)
             }
             InfoBox {
                 id: cal
                 title: "Calories"
-                text: appcontroller.cal
+                text: formatter.formatCalories(appcontroller.cal)
             }
         }
         Row {
@@ -28,12 +28,12 @@ Page {
             InfoBox {
                 id: speed
                 title: "Speed"
-                text: appcontroller.speed
+                text: formatter.formatSpeed(appcontroller.speed)
             }
             InfoBox {
                 id: avgSpeed
                 title: "Average speed"
-                text: appcontroller.avgSpeed
+                text: formatter.formatSpeed(appcontroller.avgSpeed)
             }
         }
     }
@@ -48,7 +48,7 @@ Page {
             fontPixelSize: 50
             width:  460
             height: width * 0.2
-            text: appcontroller.time
+            text: formatter.formatTime(appcontroller.time)
         }
         InfoBox {
             id: step
@@ -110,7 +110,7 @@ Page {
                         pos = pb.width - width;
                     return pos;
                 }
-                text: appcontroller.formatDistance(appcontroller.todayDistance)
+                text: formatter.formatDistance(appcontroller.todayDistance)
                 platformStyle: LabelStyle {
                     textColor: "yellow"
                     fontPixelSize: 30
@@ -119,7 +119,7 @@ Page {
         }
         Label {
             id: targetLbl
-            text: appcontroller.formatDistance(appcontroller.daily)
+            text: formatter.formatDistance(appcontroller.daily)
             anchors.right: parent.right
             anchors.rightMargin: 5
             anchors.verticalCenter: parent.verticalCenter

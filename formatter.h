@@ -21,7 +21,7 @@ class Formatter : public QObject
 
 public:
 
-    QString formatDistance(double distance) const {
+    Q_INVOKABLE QString formatDistance(double distance) const {
         QString ret;
         switch(units) {
             case METRIC:
@@ -40,17 +40,23 @@ public:
         return ret;
     }
 
-    QString formatSpeed(double speed) const {
+    Q_INVOKABLE QString formatSpeed(double speed) const {
         return formatDistance(speed) + "/h";
     }
 
-    QString formatPercent(double v) const {
+    Q_INVOKABLE QString formatCalories(double c) const {
+        QString ret;
+        ret.sprintf("%.2f", c);
+        return ret;
+    }
+
+    Q_INVOKABLE QString formatPercent(double v) const {
         QString ret;
         ret.sprintf("%.2f %", v);
         return ret;
     }
 
-    QString formatTime(int seconds) const {
+    Q_INVOKABLE QString formatTime(int seconds) const {
         int sec = seconds % 60;
         int min = (seconds / 60) % 60;
         int hr = (seconds / 3600) % 24;
