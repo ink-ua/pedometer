@@ -22,7 +22,7 @@ QTM_USE_NAMESPACE
 #define EPS 0.001
 
 #define CALORIES_PER_STEP_BASE 0.04
-#define BASE_WEIGHT 50 // kg
+#define BASE_WEIGHT 70 // kg
 #define CALORIES_WEIGHT_FACTOR 0.0005
 
 #define CURRENT_VERSION "1.2.0"
@@ -34,7 +34,7 @@ class AppController : public QObject
     Q_PROPERTY(double stepLength READ getStepLength WRITE setStepLength NOTIFY stepLengthChanged)
     Q_PROPERTY(double daily READ getDaily WRITE setDaily NOTIFY dailyChanged)
     Q_PROPERTY(int steps READ getSteps WRITE setSteps NOTIFY stepsChanged)
-    Q_PROPERTY(int seconds READ getSeconds WRITE setSeconds NOTIFY timeChanged)
+    Q_PROPERTY(int seconds READ getSeconds WRITE setSeconds NOTIFY secondsChanged)
     Q_PROPERTY(double distance READ getDistance NOTIFY distanceChanged)
     Q_PROPERTY(double avgSpeed READ getAvgSpeed NOTIFY avgSpeedChanged)
     Q_PROPERTY(double speed READ getSpeed NOTIFY speedChanged)
@@ -172,12 +172,12 @@ public:
         if(m_seconds != s) {
             if(!m_freezeTimer || QDateTime::currentMSecsSinceEpoch() - m_lastStepTimestamp < 2000) {
                 m_seconds = s;
-                timeChanged();
-                avgSpeedChanged();
+                emit secondsChanged();
+                emit avgSpeedChanged();
             }
 
             if(m_lastSecond == LAST_STEPS_TIME - 1) {
-                speedChanged();
+                emit speedChanged();
                 for(int i = 0; i < LAST_STEPS_TIME - 1; i++)
                     m_lastSteps[i] = m_lastSteps[i + 1];
                 m_lastSteps[LAST_STEPS_TIME - 1] = 0;
@@ -333,7 +333,7 @@ private:
 signals:
      void runningChanged();
      void stepsChanged();
-     void timeChanged();
+     void secondsChanged();
      void distanceChanged();
      void stepLengthChanged();
      void avgSpeedChanged();

@@ -48,7 +48,7 @@ Page {
             fontPixelSize: 50
             width:  460
             height: width * 0.2
-            text: formatter.formatTime(appcontroller.time)
+            text: formatter.formatTime(appcontroller.seconds)
         }
         InfoBox {
             id: step

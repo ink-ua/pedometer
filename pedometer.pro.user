@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by Qt Creator 2.4.0, 2012-04-16T18:01:14. -->
+<!-- Written by Qt Creator 2.4.0, 2012-04-16T21:12:01. -->
 <qtcreator>
  <data>
   <variable>ProjectExplorer.Project.ActiveTarget</variable>
@@ -170,6 +170,7 @@
       <valuelist type="QVariantList" key="Qt4ProjectManager.MaemoRunConfiguration.LastDeployedFiles">
        <value type="QString">/home/ink/workspace/programming/meego/pedometer-build-harmattan/pedometer_0_0_2_armel.deb</value>
        <value type="QString">/home/ink/workspace/programming/meego/pedometer-build-harmattan/pedometer_0.0.4_armel.deb</value>
+       <value type="QString">/home/ink/workspace/programming/meego/pedometer-build-harmattan/pedometer_1.2.0_armel.deb</value>
        <value type="QString">/home/ink/workspace/programming/meego/pedometer-build-harmattan/pedometer_0_0_1_armel.deb</value>
        <value type="QString">/home/ink/workspace/programming/meego/pedometer-build-harmattan/pedometer_0.0.4_armel.deb</value>
        <value type="QString">/home/ink/workspace/programming/meego/pedometer-build-harmattan/pedometer_1.0.0_armel.deb</value>
@@ -182,6 +183,7 @@
       <valuelist type="QVariantList" key="Qt4ProjectManager.MaemoRunConfiguration.LastDeployedHosts">
        <value type="QString">localhost</value>
        <value type="QString">192.168.1.9</value>
+       <value type="QString">192.168.0.101</value>
        <value type="QString">localhost</value>
        <value type="QString">192.168.0.100</value>
        <value type="QString">192.168.0.101</value>
@@ -202,10 +204,12 @@
        <value type="QString"></value>
        <value type="QString"></value>
        <value type="QString"></value>
+       <value type="QString"></value>
       </valuelist>
       <valuelist type="QVariantList" key="Qt4ProjectManager.MaemoRunConfiguration.LastDeployedTimes">
        <value type="QDateTime">2011-09-22T20:55:05</value>
        <value type="QDateTime">2011-10-11T16:09:46</value>
+       <value type="QDateTime">2012-04-16T21:08:51</value>
        <value type="QDateTime">2011-09-16T21:44:30</value>
        <value type="QDateTime">2011-10-15T01:38:30</value>
        <value type="QDateTime">2011-11-28T23:24:15</value>

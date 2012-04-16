@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <QtSql/QSqlQuery>
-//#include <QDebug>
+#include <QDebug>
 
 #include "appcontroller.h"
 #include "historyentry.h"
@@ -50,6 +50,7 @@ public:
             m_today = h;
         }
         m_countEntries++;
+        emit avgRateChanged();
         return h;
     }
 
@@ -78,7 +79,7 @@ public:
     }
     double getAvgRate() {
         double result = 0;
-        //qDebug() << m_totalRate << " " << m_countEntries;
+        qDebug() << m_totalRate << " " << m_countEntries;
         if(m_totalRate > 0 && m_countEntries > 0) {
             result = m_totalRate / m_countEntries;
         }

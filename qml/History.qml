@@ -242,15 +242,15 @@ Page {
                     width:parent.width
                 }
                 InfoBox {
-                    id: totalCalories
-                    title: "Total calories"
-                    text: formatter.formatCalories(historyProvider.totalCalories)
-                    width:parent.width
-                }
-                InfoBox {
                     id: avgSpeed
                     title: "Average speed"
                     text: formatter.formatSpeed(appcontroller.calculateSpeed(historyProvider.totalDistance, historyProvider.totalTime))
+                    width:parent.width
+                }
+                InfoBox {
+                    id: totalCalories
+                    title: "Total calories"
+                    text: formatter.formatCalories(historyProvider.totalCalories)
                     width:parent.width
                 }
                 InfoBox {
