@@ -17,18 +17,21 @@ class HistoryProvider : public QObject
     Q_PROPERTY(double totalDistance READ getTotalDistance NOTIFY totalDistanceChanged)
     Q_PROPERTY(double totalCalories READ getTotalCalories NOTIFY totalCaloriesChanged)
     Q_PROPERTY(double avgSpeed READ getAvgSpeed NOTIFY avgSpeedChanged)
+    Q_PROPERTY(double avgSteps READ getAvgSteps NOTIFY avgStepsChanged)
+    Q_PROPERTY(double avgTime READ getAvgTime NOTIFY avgTimeChanged)
+    Q_PROPERTY(double avgCalories READ getAvgCalories NOTIFY avgCaloriesChanged)
+    Q_PROPERTY(double avgDistance READ getAvgDistance NOTIFY avgDistanceChanged)
     Q_PROPERTY(double avgRate READ getAvgRate NOTIFY avgRateChanged)
 
 public:
     HistoryProvider(QObject* parent =0) : QObject(parent), m_totalTime(0),
         m_totalSteps(0), m_totalDistance(0), m_totalCalories(0), m_today(0),
-        m_countEntries(0), m_totalRate(0)
+        m_countDays(0), m_totalRate(0)
     {
         QObject::connect(AppController::getInstance(), SIGNAL(unitsChanged()), this, SLOT(onUnitsChanged()));
     }
 
     Q_INVOKABLE void loadHistory() {
-        //qDebug() << "loadHistory()";
         m_totalTime = 0;
         m_totalSteps = 0;
         m_totalDistance = 0;
@@ -49,8 +52,12 @@ public:
         if(h->getDate() == AppController::getInstance()->getCurrentDate()) {
             m_today = h;
         }
-        m_countEntries++;
+        m_countDays++;
         emit avgRateChanged();
+        emit avgStepsChanged();
+        emit avgTimeChanged();
+        emit avgCaloriesChanged();
+        emit avgDistanceChanged();
         return h;
     }
 
@@ -77,13 +84,22 @@ public:
         }
         return result;
     }
+
+    // Averages
+    int getAvgSteps() {
+        return calcAvg(m_totalSteps);
+    }
+    int getAvgTime() {
+        return calcAvg(m_totalTime);
+    }
+    double getAvgDistance() {
+        return calcAvg(m_totalDistance);
+    }
+    double getAvgCalories() {
+        return calcAvg(m_totalCalories);
+    }
     double getAvgRate() {
-        double result = 0;
-        qDebug() << m_totalRate << " " << m_countEntries;
-        if(m_totalRate > 0 && m_countEntries > 0) {
-            result = m_totalRate / m_countEntries;
-        }
-        return result;
+        return calcAvg(m_totalRate);
     }
 
     void addTotal(int t, int s, double d, double c) {
@@ -98,6 +114,10 @@ public:
         emit totalTimeChanged();
         emit avgSpeedChanged();
         emit avgRateChanged();
+        emit avgStepsChanged();
+        emit avgTimeChanged();
+        emit avgCaloriesChanged();
+        emit avgDistanceChanged();
     }
 
 private:
@@ -107,8 +127,17 @@ private:
     double m_totalDistance;
     double m_totalCalories;
     double m_totalRate;
-    int m_countEntries;
+    int m_countDays;
     HistoryEntry* m_today;
+
+    template <typename T>
+    T calcAvg(T total) {
+        T result = 0;
+        if(total > 0 && m_countDays > 0) {
+            result = total / m_countDays;
+        }
+        return result;
+    }
 
 signals:
     void totalDistanceChanged();
@@ -117,6 +146,10 @@ signals:
     void totalTimeChanged();
     void avgSpeedChanged();
     void avgRateChanged();
+    void avgStepsChanged();
+    void avgTimeChanged();
+    void avgCaloriesChanged();
+    void avgDistanceChanged();
 //    void entryAddedToList(QObject* e);
 
 public slots:
@@ -129,7 +162,7 @@ public slots:
         }
         else {
             m_today = new HistoryEntry(t, s, d, c, date);
-            m_countEntries++;
+            m_countDays++;
 //            emit entryAddedToList(m_today);
         }
         addTotal(t, s, d, c);

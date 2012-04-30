@@ -3,6 +3,7 @@
 
 //#include <QDebug>
 #include <QObject>
+#include <QTime>
 
 #define METERS_IN_MILE 1609.344
 #define METERS_IN_FOOT 0.3048
@@ -56,13 +57,19 @@ public:
         return ret;
     }
 
-    Q_INVOKABLE QString formatTime(int seconds) const {
+    Q_INVOKABLE QString formatTime(quint64 seconds) const {
         int sec = seconds % 60;
         int min = (seconds / 60) % 60;
         int hr = (seconds / 3600) % 24;
+        int days = seconds / 86400;
 
         QString ret;
         ret.sprintf("%.2d:%.2d:%.2d", hr, min, sec);
+        if(days > 0) {
+            QString strDay;
+            strDay.sprintf("%d days ", days);
+            ret.prepend(strDay);
+        }
         return ret;
     }
 

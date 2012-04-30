@@ -231,7 +231,7 @@ Page {
                 }
                 InfoBox {
                     id: totalTime
-                    title: "Total time"
+                    title: "Total time tracked"
                     text: formatter.formatTime(historyProvider.totalTime)
                     width: parent.width
                 }
@@ -242,15 +242,51 @@ Page {
                     width:parent.width
                 }
                 InfoBox {
+                    id: totalCalories
+                    title: "Total calories"
+                    text: formatter.formatCalories(historyProvider.totalCalories)
+                    width:parent.width
+                }
+                InfoBox {
                     id: avgSpeed
                     title: "Average speed"
                     text: formatter.formatSpeed(appcontroller.calculateSpeed(historyProvider.totalDistance, historyProvider.totalTime))
                     width:parent.width
                 }
+            }
+        }
+
+        Item {
+            id: avg
+            anchors.centerIn: parent
+            height: parent.height
+            width: 430
+            Column {
+                spacing: 10
+                anchors.centerIn: parent
+                width: parent.width
                 InfoBox {
-                    id: totalCalories
-                    title: "Total calories"
-                    text: formatter.formatCalories(historyProvider.totalCalories)
+                    id: avgSteps
+                    title: "Steps per day"
+                    text: historyProvider.avgSteps
+                    width: parent.width
+                }
+                InfoBox {
+                    id: avgTime
+                    title: "Time tracked per day"
+                    text: formatter.formatTime(historyProvider.avgTime)
+                    width: parent.width
+                }
+                InfoBox {
+                    id: avgDistance
+                    title: "Distance per day"
+                    text: formatter.formatDistance(historyProvider.avgDistance)
+                    width:parent.width
+                }
+                InfoBox {
+                    id: avgCalories
+                    title: "Calories per day"
+                    text: formatter.formatCalories(historyProvider.avgCalories)
                     width:parent.width
                 }
                 InfoBox {
@@ -394,6 +430,10 @@ Page {
         TabButton {
             text: "Totals"
             tab: total
+        }
+        TabButton {
+            text: "Average"
+            tab: avg
         }
         TabButton {
             text: "Daily"

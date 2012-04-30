@@ -29,7 +29,7 @@ Page {
             spacing: 30
             Label {
                 id:lblStep
-                text: "Step length (m)"
+                text: "Stride length (m)"
                 platformStyle: prefLabel
             }
             TextField {
