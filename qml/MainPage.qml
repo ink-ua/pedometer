@@ -27,7 +27,7 @@ Page {
             spacing: 5
             InfoBox {
                 id: speed
-                title: "Speed"
+                title: "Current speed"
                 text: formatter.formatSpeed(appcontroller.speed)
             }
             InfoBox {
