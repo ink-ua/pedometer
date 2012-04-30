@@ -57,9 +57,7 @@ public slots:
 
     void onVersionChanged(QString oldVersion, QString newVersion) {
         // add distance and calories columns migrating from version 1.1
-        //qDebug() << "onVersionChanged()";
         if(oldVersion == "1.1.0") {
-            //qDebug() << "1.1";
             QSqlQuery q(m_db);
             if(q.exec("ALTER TABLE history ADD COLUMN distance REAL") == false)
                 qDebug() << "error altering" << m_db.lastError().text();;

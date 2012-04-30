@@ -25,7 +25,7 @@ QTM_USE_NAMESPACE
 #define BASE_WEIGHT 70 // kg
 #define CALORIES_WEIGHT_FACTOR 0.0005
 
-#define CURRENT_VERSION "1.2.0"
+#define CURRENT_VERSION "1.2.1" // TODO should be set automatically
 
 class AppController : public QObject
 {
