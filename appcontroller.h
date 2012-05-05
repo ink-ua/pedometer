@@ -46,6 +46,7 @@ class AppController : public QObject
     Q_PROPERTY(bool freeze READ getFreeze WRITE setFreeze NOTIFY freezeChanged)
     Q_PROPERTY(int units READ getUnits WRITE setUnits NOTIFY unitsChanged)
     Q_PROPERTY(double weight READ getWeight WRITE setWeight NOTIFY weightChanged)
+    Q_PROPERTY(bool countPairs READ getCountPairs WRITE setCountPairs NOTIFY countPairsChanged)
 
 public:
     static void init(QAccelerometer* s) {
@@ -265,6 +266,17 @@ public:
         }
     }
 
+    bool getCountPairs() {
+        return m_countPairs;
+    }
+    void setCountPairs(bool cp) {
+        if(cp != m_countPairs) {
+            m_countPairs = cp;
+            settings.setValue("count_pairs", QVariant(m_countPairs));
+            emit countPairsChanged();
+        }
+    }
+
     QString getVersion() const {
         return m_version;
     }
@@ -287,7 +299,11 @@ public:
 public slots:
 
     void incStep() {
-        setSteps(getSteps() + 1);
+        setSteps(getSteps() + m_incStepAmount);
+    }
+
+    void onCountPairsChanged() {
+        m_incStepAmount = m_countPairs ? 2 : 1;
     }
 
     void onClose() {
@@ -329,6 +345,8 @@ private:
     bool m_freezeTimer;
     QString m_version;
     QDate m_currentDate;
+    bool m_countPairs;
+    short m_incStepAmount;
 
 signals:
      void runningChanged();
@@ -349,5 +367,6 @@ signals:
      void unitsChanged();
      void entryAdded(int t, int s, double d, double c, QDate date);
      void versionChanged(QString oldVersion, QString newVersion);
+     void countPairsChanged();
 };
 #endif // APPCONTROLLER_H

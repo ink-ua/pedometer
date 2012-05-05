@@ -1,5 +1,5 @@
 import QtQuick 1.1
-import com.nokia.meego 1.0
+import com.nokia.meego 1.1
 
 Page {
     id: prefPage
@@ -22,7 +22,7 @@ Page {
     }
 
     Column {
-        spacing: 35        
+        spacing: 30
         anchors.centerIn: parent
         Grid {
             columns: 2
@@ -87,6 +87,38 @@ Page {
                 anchors.verticalCenter: lblWeight.verticalCenter
             }
         }
+        Grid {
+            columns: 2
+            spacing: 30
+            Label {
+                id: lblFreeze
+                text: "Freeze when not walking"
+                platformStyle: prefLabel
+            }
+            Switch {
+                checked: appcontroller.freeze
+                onCheckedChanged: {
+                    appcontroller.freeze = checked;
+                }
+                anchors.verticalCenter: lblFreeze.verticalCenter
+            }
+        }
+        Grid {
+            columns: 2
+            spacing: 30
+            Label {
+                id: lblPair
+                text: "Count pairs of steps"
+                platformStyle: prefLabel
+            }
+            Switch {
+                checked: appcontroller.countPairs
+                onCheckedChanged: {
+                    appcontroller.countPairs = checked;
+                }
+                anchors.verticalCenter: lblPair.verticalCenter
+            }
+        }
         Column {
             spacing: 10
             Label {
@@ -121,22 +153,6 @@ Page {
                     theme.inverted = checked;
                 }
                 anchors.verticalCenter: lblInv.verticalCenter
-            }
-        }
-        Grid {
-            columns: 2
-            spacing: 30
-            Label {
-                id: lblFreeze
-                text: "Freeze when not walking"
-                platformStyle: prefLabel
-            }
-            Switch {
-                checked: appcontroller.freeze
-                onCheckedChanged: {
-                    appcontroller.freeze = checked;
-                }
-                anchors.verticalCenter: lblFreeze.verticalCenter
             }
         }
         Column {
