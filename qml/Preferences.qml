@@ -22,8 +22,11 @@ Page {
     }
 
     Column {
-        spacing: 30
-        anchors.centerIn: parent
+        spacing: 30;
+        anchors.top: parent.top;
+        anchors.topMargin: 5;
+        anchors.horizontalCenter: parent.horizontalCenter;
+
         Grid {
             columns: 2
             spacing: 30

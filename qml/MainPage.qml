@@ -1,40 +1,36 @@
 import QtQuick 1.1
-import com.nokia.meego 1.0
+import com.nokia.meego 1.1
 
 Page {
     id: mainPage
     orientationLock: PageOrientation.LockPortrait
 
-    Column {
+    Grid {
+        columns: 2;
         anchors.top: parent.top
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.margins: 10
         spacing: 5
-        Row {
-            spacing: 5
-            InfoBox {
-                id: distance
-                title: "Distance"
-                text: formatter.formatDistance(appcontroller.distance)
-            }
-            InfoBox {
-                id: cal
-                title: "Calories"
-                text: formatter.formatCalories(appcontroller.cal)
-            }
+
+        InfoBox {
+            id: distance
+            title: "Distance"
+            text: formatter.formatDistance(appcontroller.distance)
         }
-        Row {
-            spacing: 5
-            InfoBox {
-                id: speed
-                title: "Current speed"
-                text: formatter.formatSpeed(appcontroller.speed)
-            }
-            InfoBox {
-                id: avgSpeed
-                title: "Average speed"
-                text: formatter.formatSpeed(appcontroller.avgSpeed)
-            }
+        InfoBox {
+            id: cal
+            title: "Calories"
+            text: formatter.formatCalories(appcontroller.cal)
+        }
+        InfoBox {
+            id: speed
+            title: "Current speed"
+            text: formatter.formatSpeed(appcontroller.speed)
+        }
+        InfoBox {
+            id: avgSpeed
+            title: "Average speed"
+            text: formatter.formatSpeed(appcontroller.avgSpeed)
         }
     }
 

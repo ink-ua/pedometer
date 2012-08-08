@@ -1,14 +1,25 @@
 import QtQuick 1.1
-import com.nokia.meego 1.0
+import com.nokia.meego 1.1
 
 Page {
     id: histPage
     orientationLock: PageOrientation.LockPortrait
 
-    Component.onCompleted: {
-        historyProvider.loadHistory();
-        while(historyProvider.nextEntry())
-            historyModel.append(historyProvider.getNextEntry());
+    onStatusChanged: {
+        if (status == PageStatus.Activating) {
+            indicator.running = true;
+        } else if(status == PageStatus.Active) {
+            // don't reload history, just add missing entries
+            // load on Component.onCompleted ?
+            // what about BusyIndicator ?
+            historyProvider.loadHistory();
+            while(historyProvider.nextEntry()) {
+                historyModel.append(historyProvider.getNextEntry());
+            }
+            indicator.running = false;
+        } else if(status == PageStatus.Deactivating) {
+            historyModel.clear();
+        }
     }
 
 //    Connections {
@@ -30,7 +41,6 @@ Page {
                 + (red <= 0xF ? "0" : "") + red.toString(16) // red component
                 + (green <= 0xF ? "0" : "") + green.toString(16) // green component
                 + "00"; // no blue
-        //console.log(result);
         return result;
     }
 
@@ -432,12 +442,20 @@ Page {
             tab: total
         }
         TabButton {
-            text: "Average"
+            text: "Daily"
             tab: avg
         }
         TabButton {
-            text: "Daily"
+            text: "History"
             tab: daily
         }
+    }
+
+    BusyIndicator {
+        id: indicator
+        platformStyle: BusyIndicatorStyle { size: "large" }
+        running: false
+        visible: running
+        anchors.centerIn: parent
     }
 }

@@ -36,6 +36,7 @@ public:
         m_totalSteps = 0;
         m_totalDistance = 0;
         m_totalCalories = 0;
+        m_countDays = 0;
         queryTotal = DBUtils::getInstance()->getTotalsByDay();
     }
 
