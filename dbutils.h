@@ -42,9 +42,9 @@ public:
         return queryToday.next() ? queryToday.value(0).toDouble() : 0;
     }
 
-    QSqlQuery getTotalsByDay() const {
+    QSqlQuery getTotalsByDayAsc() const {
         //qDebug() << "getTotalsByDay()";
-        QSqlQuery q = m_db.exec("SELECT SUM(seconds), SUM(steps), SUM(distance), SUM(calories), date FROM history GROUP BY date ORDER BY date DESC");
+        QSqlQuery q = m_db.exec("SELECT SUM(seconds), SUM(steps), SUM(distance), SUM(calories), date FROM history GROUP BY date ORDER BY date ASC");
         //qDebug() << q.lastError();
         return q;
     }

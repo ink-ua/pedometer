@@ -24,21 +24,40 @@ class HistoryEntry : public QObject
 public:
     enum HISTORY_ROLES { STEPS = Qt::UserRole + 1, TIME, DAY, MONTH, SECONDS, DISTANCE, CALORIES };
 
-    //HistoryEntry(QObject *parent=0) : QObject(parent) {}
-    HistoryEntry(int time, int steps, double distance, double calories, QString date, QObject *parent=0)
-        : QObject(parent), m_time(time), m_steps(steps), m_distance(distance), m_calories(calories),
-          m_date(QDate::fromString(date, "yyyy-MM-dd"))
-    {
-        init();
-    }
+//    //HistoryEntry(QObject *parent=0) : QObject(parent) {}
+//    HistoryEntry(int time, int steps, double distance, double calories, QString date, QObject *parent=0)
+//        : QObject(parent), m_time(time), m_steps(steps), m_distance(distance), m_calories(calories),
+//          m_date(QDate::fromString(date, "yyyy-MM-dd"))
+//    {
+//        init();
+//    }
     HistoryEntry(int time, int steps, double distance, double calories, QDate date, QObject *parent=0)
         : QObject(parent), m_time(time), m_steps(steps), m_distance(distance), m_calories(calories), m_date(date)
     {
         init();
     }
 
+    HistoryEntry(const HistoryEntry& rhs) {
+        HistoryEntry(rhs.m_time, rhs.m_steps, rhs.m_distance, rhs.m_calories, rhs.m_date, rhs.parent());
+        init();
+    }
+
+    HistoryEntry() {}
+
     void init() {
         QObject::connect(AppController::getInstance(), SIGNAL(unitsChanged()), this, SLOT(onUnitsChanged()));
+    }
+
+    void populate(int time, int steps, double distance, double calories) {
+        m_time = time;
+        m_steps = steps;
+        m_distance = distance;
+        m_calories = calories;
+
+        emit timeChanged();
+        emit stepsChanged();
+        emit distanceChanged();
+        emit caloriesChanged();
     }
 
     QVariant data(int role) const {
@@ -152,4 +171,7 @@ private:
     double m_calories;
     QDate m_date;
 };
+
+Q_DECLARE_METATYPE(HistoryEntry)
+
 #endif // HISTORYENTRY_H

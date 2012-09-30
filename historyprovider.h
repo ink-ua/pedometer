@@ -6,6 +6,7 @@
 #include <QDebug>
 
 #include "appcontroller.h"
+#include "historymodel.h"
 #include "historyentry.h"
 #include "dbutils.h"
 
@@ -24,46 +25,63 @@ class HistoryProvider : public QObject
     Q_PROPERTY(double avgRate READ getAvgRate NOTIFY avgRateChanged)
 
 public:
-    HistoryProvider(QObject* parent =0) : QObject(parent), m_totalTime(0),
-        m_totalSteps(0), m_totalDistance(0), m_totalCalories(0), m_today(0),
-        m_countDays(0), m_totalRate(0)
+    HistoryProvider(HistoryModel& historyModel, QObject* parent =0) : QObject(parent), m_totalTime(0),
+        m_totalSteps(0), m_totalDistance(0), m_totalCalories(0),
+        m_countDays(0), m_totalRate(0), m_historyModel(historyModel)
     {
         QObject::connect(AppController::getInstance(), SIGNAL(unitsChanged()), this, SLOT(onUnitsChanged()));
+        m_today = new HistoryEntry(0, 0, 0, 0, AppController::getInstance()->getCurrentDate(), this);
     }
 
-    Q_INVOKABLE void loadHistory() {
-        m_totalTime = 0;
-        m_totalSteps = 0;
-        m_totalDistance = 0;
-        m_totalCalories = 0;
-        m_countDays = 0;
-        queryTotal = DBUtils::getInstance()->getTotalsByDay();
+    // returns true if history reloaded
+    // false in case when only today changed since last load
+    Q_INVOKABLE void reloadHistory() {
+        QDate current = AppController::getInstance()->getCurrentDate();
+        if(m_reloadDate < current) {
+            m_totalTime = 0;
+            m_totalSteps = 0;
+            m_totalDistance = 0;
+            m_totalCalories = 0;
+            m_countDays = 0;
+            m_reloadDate = current;
+            queryTotal = DBUtils::getInstance()->getTotalsByDayAsc();
+
+            while(hasNextEntry()) {
+                m_historyModel.add(getNextEntry());
+            }
+        }
     }
 
-    Q_INVOKABLE QObject* getNextEntry() {
+    Q_INVOKABLE HistoryEntry* getNextEntry() {
         int t = queryTotal.value(0).toInt();
         int s = queryTotal.value(1).toInt();
         double d = queryTotal.value(2).toDouble();
         double c = queryTotal.value(3).toDouble();
-        QString date = queryTotal.value(4).toString();
+        QString dateStr = queryTotal.value(4).toString();
+        QDate date = QDate::fromString(dateStr, "yyyy-MM-dd");
 
+        HistoryEntry* result;
+        // set today data
+        if(date == m_reloadDate) {
+            m_today->populate(t, s, d, c);
+            result = m_today;
+        } else {
+            result = new HistoryEntry(t, s, d, c, date, this);
+        }
+
+        // modify totals and averages
+        m_countDays++;
         addTotal(t, s, d, c);
 
-        HistoryEntry* h = new HistoryEntry(t, s, d, c, date);
-        if(h->getDate() == AppController::getInstance()->getCurrentDate()) {
-            m_today = h;
-        }
-        m_countDays++;
-        emit avgRateChanged();
-        emit avgStepsChanged();
-        emit avgTimeChanged();
-        emit avgCaloriesChanged();
-        emit avgDistanceChanged();
-        return h;
+        return result;
     }
 
-    Q_INVOKABLE bool nextEntry() {
+    Q_INVOKABLE bool hasNextEntry() {
         return queryTotal.next();
+    }
+
+    Q_INVOKABLE QObject* getTodayEntry() {
+        return m_today;
     }
 
     quint64 getTotalSteps() {
@@ -129,7 +147,9 @@ private:
     double m_totalCalories;
     double m_totalRate;
     int m_countDays;
+    HistoryModel& m_historyModel;
     HistoryEntry* m_today;
+    QDate m_reloadDate;
 
     template <typename T>
     T calcAvg(T total) {
@@ -151,22 +171,21 @@ signals:
     void avgTimeChanged();
     void avgCaloriesChanged();
     void avgDistanceChanged();
-//    void entryAddedToList(QObject* e);
 
 public slots:
     void addEntry(int t, int s, double d, double c, QDate date) {
-        if(m_today && m_today->getDate() == date) {
+        if(m_today->getDate() == date) {
             m_today->plusSteps(s);
             m_today->plusTime(t);
             m_today->plusDistance(d);
             m_today->plusCalories(c);
+            addTotal(t, s, d, c);
         }
         else {
-            m_today = new HistoryEntry(t, s, d, c, date);
-            m_countDays++;
-//            emit entryAddedToList(m_today);
+            // assume that on the next request all entries will be reloaded
+//            delete m_today;
+            m_today = new HistoryEntry(t, s, d, c, date, this);
         }
-        addTotal(t, s, d, c);
     }
 
     void onUnitsChanged() {

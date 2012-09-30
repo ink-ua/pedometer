@@ -64,7 +64,8 @@ HEADERS += \
     stephandler.h \
     historyprovider.h \
     formatter.h \
-    dbutils.h
+    dbutils.h \
+    historymodel.h
 
 contains(MEEGO_EDITION,harmattan) {
     icon.files = pedometer.png

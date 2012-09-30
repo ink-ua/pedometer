@@ -12,14 +12,25 @@ Page {
             // don't reload history, just add missing entries
             // load on Component.onCompleted ?
             // what about BusyIndicator ?
-            historyProvider.loadHistory();
-            while(historyProvider.nextEntry()) {
-                historyModel.append(historyProvider.getNextEntry());
-            }
+
+            historyProvider.reloadHistory();
+
+//            if(historyProvider.reloadHistory()) {
+//                historyModel.clear();
+//                while(historyProvider.hasNextEntry()) {
+//                    historyModel.append(historyProvider.getNextEntry());
+//                }
+//            } else {
+//                historyModel.set(0, historyProvider.getTodayEntry());
+//            }
+
+
+
             indicator.running = false;
-        } else if(status == PageStatus.Deactivating) {
-            historyModel.clear();
         }
+//        else if(status == PageStatus.Deactivating) {
+//            historyModel.clear();
+//        }
     }
 
 //    Connections {
@@ -44,9 +55,9 @@ Page {
         return result;
     }
 
-    ListModel {
-        id: historyModel
-    }
+//    ListModel {
+//        id: historyModel
+//    }
 
     Gradient {
         id: dateDark

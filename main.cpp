@@ -8,6 +8,7 @@
 #include "appcontroller.h"
 #include "stephandler.h"
 #include "historyprovider.h"
+#include "historymodel.h"
 #include "dbutils.h"
 
 int main(int argc, char *argv[])
@@ -31,7 +32,8 @@ int main(int argc, char *argv[])
     sensor.addFilter(&filter);
     QObject::connect(&filter, SIGNAL(onStep()), AppController::getInstance(), SLOT(incStep()));
 
-    HistoryProvider historyProvider;
+    HistoryModel historyModel;
+    HistoryProvider historyProvider(historyModel);
     QObject::connect(AppController::getInstance(), SIGNAL(entryAdded(int, int, double, double, QDate)), &historyProvider, SLOT(addEntry(int, int, double, double, QDate)));
     QObject::connect(AppController::getInstance(), SIGNAL(entryAdded(int, int, double, double, QDate)), DBUtils::getInstance(), SLOT(addEntry(int, int, double, double, QDate)));
 
@@ -40,6 +42,7 @@ int main(int argc, char *argv[])
     view.connect(view.engine(), SIGNAL(quit()), SLOT(close()));
     view.rootContext()->setContextProperty("appcontroller", AppController::getInstance());
     view.rootContext()->setContextProperty("historyProvider", &historyProvider);
+    view.rootContext()->setContextProperty("historyModel", &historyModel);
     view.rootContext()->setContextProperty("formatter", Formatter::getInstance());
 
 //    Object* notif = view.rootObject()->findChild<QObject *>("goalReachedNotification");
