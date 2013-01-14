@@ -10,17 +10,15 @@ class HistoryModel : public QAbstractListModel {
     Q_OBJECT
 
 public:
-    enum HISTORY_ROLES { STEPS = Qt::UserRole + 1, TIME, DAY, MONTH, SECONDS, DISTANCE, CALORIES };
-
     HistoryModel(QObject *parent =0) : QAbstractListModel(parent) {
         QHash<int, QByteArray> roles;
-        roles[STEPS] = "steps";
-        roles[TIME] = "time";
-        roles[DAY] = "day";
-        roles[MONTH] = "month";
-        roles[SECONDS] = "seconds";
-        roles[DISTANCE] = "distance";
-        roles[CALORIES] = "calories";
+        roles[HistoryEntry::STEPS] = "steps";
+        roles[HistoryEntry::TIME] = "time";
+        roles[HistoryEntry::DAY] = "day";
+        roles[HistoryEntry::MONTH] = "month";
+        roles[HistoryEntry::SECONDS] = "seconds";
+        roles[HistoryEntry::DISTANCE] = "distance";
+        roles[HistoryEntry::CALORIES] = "calories";
         setRoleNames(roles);
     }
 
@@ -32,17 +30,18 @@ public:
         if (!index.isValid() || (index.row() >= m_entries.size() || index.row() < 0)) {
             return QVariant();
         }
-
         if (role == Qt::DisplayRole) {
-            //return m_entries.at(index.row());
             return QVariant::fromValue(*m_entries.at(index.row()));
-//            return *((QVariant*)m_entries.at(index.row()));
         }
         return m_entries.at(index.row())->data(role);
     }
 
     void add(HistoryEntry* e) {
         m_entries.push_back(e);
+    }
+
+    void clear() {
+        m_entries.clear();
     }
 
 private:

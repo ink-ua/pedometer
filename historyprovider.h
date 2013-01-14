@@ -23,21 +23,22 @@ class HistoryProvider : public QObject
     Q_PROPERTY(double avgCalories READ getAvgCalories NOTIFY avgCaloriesChanged)
     Q_PROPERTY(double avgDistance READ getAvgDistance NOTIFY avgDistanceChanged)
     Q_PROPERTY(double avgRate READ getAvgRate NOTIFY avgRateChanged)
+    Q_PROPERTY(QObject* historyModel READ getHistoryModel NOTIFY historyModelChanged)
 
 public:
-    HistoryProvider(HistoryModel& historyModel, QObject* parent =0) : QObject(parent), m_totalTime(0),
+    HistoryProvider(QObject* parent =0) : QObject(parent), m_totalTime(0),
         m_totalSteps(0), m_totalDistance(0), m_totalCalories(0),
-        m_countDays(0), m_totalRate(0), m_historyModel(historyModel)
+        m_countDays(0), m_totalRate(0), m_historyModel(new HistoryModel())
     {
         QObject::connect(AppController::getInstance(), SIGNAL(unitsChanged()), this, SLOT(onUnitsChanged()));
         m_today = new HistoryEntry(0, 0, 0, 0, AppController::getInstance()->getCurrentDate(), this);
     }
 
-    // returns true if history reloaded
-    // false in case when only today changed since last load
     Q_INVOKABLE void reloadHistory() {
         QDate current = AppController::getInstance()->getCurrentDate();
         if(m_reloadDate < current) {
+            m_historyModel->clear();
+
             m_totalTime = 0;
             m_totalSteps = 0;
             m_totalDistance = 0;
@@ -47,41 +48,14 @@ public:
             queryTotal = DBUtils::getInstance()->getTotalsByDayAsc();
 
             while(hasNextEntry()) {
-                m_historyModel.add(getNextEntry());
+                m_historyModel->add(getNextEntry());
             }
+            emit historyModelChanged();
         }
     }
 
-    Q_INVOKABLE HistoryEntry* getNextEntry() {
-        int t = queryTotal.value(0).toInt();
-        int s = queryTotal.value(1).toInt();
-        double d = queryTotal.value(2).toDouble();
-        double c = queryTotal.value(3).toDouble();
-        QString dateStr = queryTotal.value(4).toString();
-        QDate date = QDate::fromString(dateStr, "yyyy-MM-dd");
-
-        HistoryEntry* result;
-        // set today data
-        if(date == m_reloadDate) {
-            m_today->populate(t, s, d, c);
-            result = m_today;
-        } else {
-            result = new HistoryEntry(t, s, d, c, date, this);
-        }
-
-        // modify totals and averages
-        m_countDays++;
-        addTotal(t, s, d, c);
-
-        return result;
-    }
-
-    Q_INVOKABLE bool hasNextEntry() {
-        return queryTotal.next();
-    }
-
-    Q_INVOKABLE QObject* getTodayEntry() {
-        return m_today;
+    HistoryModel* getHistoryModel() {
+        return m_historyModel;
     }
 
     quint64 getTotalSteps() {
@@ -147,7 +121,7 @@ private:
     double m_totalCalories;
     double m_totalRate;
     int m_countDays;
-    HistoryModel& m_historyModel;
+    HistoryModel* m_historyModel;
     HistoryEntry* m_today;
     QDate m_reloadDate;
 
@@ -158,6 +132,34 @@ private:
             result = total / m_countDays;
         }
         return result;
+    }
+
+    HistoryEntry* getNextEntry() {
+        int t = queryTotal.value(0).toInt();
+        int s = queryTotal.value(1).toInt();
+        double d = queryTotal.value(2).toDouble();
+        double c = queryTotal.value(3).toDouble();
+        QString dateStr = queryTotal.value(4).toString();
+        QDate date = QDate::fromString(dateStr, "yyyy-MM-dd");
+
+        HistoryEntry* result;
+        // set today data
+        if(date == m_reloadDate) {
+            m_today->populate(t, s, d, c);
+            result = m_today;
+        } else {
+            result = new HistoryEntry(t, s, d, c, date, this);
+        }
+
+        // modify totals and averages
+        m_countDays++;
+        addTotal(t, s, d, c);
+
+        return result;
+    }
+
+    bool hasNextEntry() {
+        return queryTotal.next();
     }
 
 signals:
@@ -171,6 +173,7 @@ signals:
     void avgTimeChanged();
     void avgCaloriesChanged();
     void avgDistanceChanged();
+    void historyModelChanged();
 
 public slots:
     void addEntry(int t, int s, double d, double c, QDate date) {

@@ -44,7 +44,12 @@ OTHER_FILES += \
     qml/Preferences.qml \
     human-white.png \
     splash.png \
-    qml/Workouts.qml
+    qml/Workouts.qml \
+    qml/harmattan-datepicker/WeekCell.qml \
+    qml/harmattan-datepicker/DayCell.qml \
+    qml/harmattan-datepicker/DatePickerStyle.qml \
+    qml/harmattan-datepicker/DatePicker.qml \
+    qml/harmattan-datepicker/DateModel.qml
 
 RESOURCES += \
     res.qrc

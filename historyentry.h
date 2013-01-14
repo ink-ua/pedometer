@@ -34,17 +34,14 @@ public:
     HistoryEntry(int time, int steps, double distance, double calories, QDate date, QObject *parent=0)
         : QObject(parent), m_time(time), m_steps(steps), m_distance(distance), m_calories(calories), m_date(date)
     {
-        init();
+        HistoryEntry();
     }
 
     HistoryEntry(const HistoryEntry& rhs) {
         HistoryEntry(rhs.m_time, rhs.m_steps, rhs.m_distance, rhs.m_calories, rhs.m_date, rhs.parent());
-        init();
     }
 
-    HistoryEntry() {}
-
-    void init() {
+    HistoryEntry() {
         QObject::connect(AppController::getInstance(), SIGNAL(unitsChanged()), this, SLOT(onUnitsChanged()));
     }
 

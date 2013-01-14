@@ -6,40 +6,10 @@ Page {
     orientationLock: PageOrientation.LockPortrait
 
     onStatusChanged: {
-        if (status == PageStatus.Activating) {
-            indicator.running = true;
-        } else if(status == PageStatus.Active) {
-            // don't reload history, just add missing entries
-            // load on Component.onCompleted ?
-            // what about BusyIndicator ?
-
+        if(status == PageStatus.Active) {
             historyProvider.reloadHistory();
-
-//            if(historyProvider.reloadHistory()) {
-//                historyModel.clear();
-//                while(historyProvider.hasNextEntry()) {
-//                    historyModel.append(historyProvider.getNextEntry());
-//                }
-//            } else {
-//                historyModel.set(0, historyProvider.getTodayEntry());
-//            }
-
-
-
-            indicator.running = false;
         }
-//        else if(status == PageStatus.Deactivating) {
-//            historyModel.clear();
-//        }
     }
-
-//    Connections {
-//        target: historyProvider
-//        entryAddedToList: {
-//            console.log(h.steps);
-//            historyModel.insert(0, h);
-//        }
-//    }
 
     function calcRateColor(distance) {
         var green = parseInt(distance / (appcontroller.daily / 0xFF));
@@ -54,10 +24,6 @@ Page {
                 + "00"; // no blue
         return result;
     }
-
-//    ListModel {
-//        id: historyModel
-//    }
 
     Gradient {
         id: dateDark
@@ -328,7 +294,7 @@ Page {
             ListView {
                 id: listView
                 anchors.fill: parent
-                model: historyModel
+                model: historyProvider.historyModel
 
                 section.property: "month"
                 section.criteria: ViewSection.FullString
@@ -460,13 +426,5 @@ Page {
             text: "History"
             tab: daily
         }
-    }
-
-    BusyIndicator {
-        id: indicator
-        platformStyle: BusyIndicatorStyle { size: "large" }
-        running: false
-        visible: running
-        anchors.centerIn: parent
     }
 }
